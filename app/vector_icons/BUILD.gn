@@ -8,6 +8,8 @@ aggregate_vector_icons("brave_vector_icons") {
   icon_directory = "."
 
   icons = [
+    "brave_ads_close_button.icon",
+    "brave_ads_info.icon",
     "download_unlock.icon",
     "speedreader.icon",
     "speedreader_on_active.icon",
