@@ -5,6 +5,12 @@ declare namespace BraveToday {
     export type GetFeedResponse = {
       feed: BraveToday.Feed | undefined
     }
+    export type GetFeedImageDataPayload = {
+      url: string
+    }
+    export type GetFeedImageDataResponse = {
+      dataUrl: string
+    }
   }
 
   export type ContentFromFeed = (Article | Deal | Media)
