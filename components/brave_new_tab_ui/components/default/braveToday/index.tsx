@@ -22,6 +22,7 @@ interface State {
 interface Props {
   feed?: BraveToday.Feed
   setOpacityForItems: (opacity: boolean) => void
+  onAnotherPageNeeded: () => void
 }
 
 class BraveToday extends React.PureComponent<Props, State> {
@@ -29,6 +30,7 @@ class BraveToday extends React.PureComponent<Props, State> {
   endOfCurrentArticlesListObserver: IntersectionObserver
   scrollTriggerToLoadMorePosts: any // React.RefObject<any>
   scrollTriggerToFocusBraveToday: any // React.RefObject<any>
+  previousYAxis: number
 
   constructor (props: Props) {
     super(props)
@@ -73,14 +75,14 @@ class BraveToday extends React.PureComponent<Props, State> {
   }
 
   handleEndOfCurrentArticlesListObserver (entities: IntersectionObserverEntry) {
-    const { contentPage } = this.state
+
     const currentYAxisForPostsBottom = entities[0].boundingClientRect.y
 
-    if (this.state.previousYAxis > currentYAxisForPostsBottom) {
-      this.setState({ contentPage: contentPage + 1 })
+    if (this.previousYAxis > currentYAxisForPostsBottom) {
+      this.props.onAnotherPageNeeded()
     }
 
-    this.setState({ previousYAxis: currentYAxisForPostsBottom })
+    this.previousYAxis = currentYAxisForPostsBottom
   }
 
   render () {

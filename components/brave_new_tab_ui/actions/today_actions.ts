@@ -7,6 +7,11 @@ type DataReceivedPayload = {
 }
 export const dataReceived = createAction<DataReceivedPayload>('dataReceived')
 
+/**
+ * Scroll has reached a position so that another page of content is needed
+ */
+export const anotherPageNeeded = createAction<void>('anotherPageNeeded')
+
 type BackgroundErrorPayload = {
   error: Error
 }
