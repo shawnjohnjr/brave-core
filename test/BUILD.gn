@@ -69,6 +69,7 @@ source_set("test_support") {
       "//brave/browser/profiles/brave_unittest_profile_manager.h",
     ]
     deps = [
+    ":blink_unit_tests",
       "//base",
       "//brave/browser/profiles",
       "//brave/test:brave_test_support_unit",
@@ -77,6 +78,22 @@ source_set("test_support") {
       "//components/sync_preferences",
     ]
   }
+}
+
+source_set("blink_unit_tests") {
+  testonly = true
+  sources = [
+      "//brave/chromium_src/third_party/blink/renderer/core/origin_trials/origin_trial_features_unittest.cc",
+  ]
+
+  defines = [
+    "INSIDE_BLINK",
+  ]
+
+  deps = [
+    "//base/test:test_support",
+    "//third_party/blink/public:blink"
+  ]
 }
 
 test("brave_unit_tests") {
@@ -110,6 +127,7 @@ test("brave_unit_tests") {
     "//brave/chromium_src/components/password_manager/core/browser/password_bubble_experiment_unittest.cc",
     "//brave/chromium_src/components/variations/service/field_trial_unittest.cc",
     "//brave/chromium_src/components/version_info/brave_version_info_unittest.cc",
+    "//brave/chromium_src/content/child/runtime_features_unittest.cc",
     "//brave/chromium_src/net/cookies/brave_canonical_cookie_unittest.cc",
     "//brave/chromium_src/services/network/public/cpp/cors/cors_unittest.cc",
     "//brave/common/brave_content_client_unittest.cc",
