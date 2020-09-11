@@ -62,6 +62,7 @@ import org.chromium.chrome.browser.tabmodel.TabModelSelectorTabObserver;
 import org.chromium.chrome.browser.toolbar.HomeButton;
 import org.chromium.chrome.browser.toolbar.ToolbarColors;
 import org.chromium.chrome.browser.toolbar.bottom.BottomToolbarVariationManager;
+import org.chromium.chrome.browser.toolbar.menu_button.MenuButtonCoordinator;
 import org.chromium.chrome.browser.toolbar.top.ToolbarLayout;
 import org.chromium.chrome.browser.util.PackageUtils;
 import org.chromium.components.browser_ui.styles.ChromeColors;
@@ -237,8 +238,8 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
     // shown and loading state is changed.
     updateBraveShieldsButtonState(null);
     if (this instanceof ToolbarPhone) {
-      if (super.getMenuButtonWrapper() != null && BottomToolbarVariationManager.isMenuButtonOnBottom()) {
-        super.getMenuButtonWrapper().setVisibility(View.GONE);
+      if (super.getMenuButtonCoordinator() != null && BottomToolbarVariationManager.isMenuButtonOnBottom()) {
+        super.getMenuButtonCoordinator().setVisibility(View.GONE);
       }
     }
   }
@@ -877,8 +878,8 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
 
   @Override
   public void onBottomToolbarVisibilityChanged(boolean isVisible) {
-    if (this instanceof ToolbarPhone && super.getMenuButtonWrapper() != null) {
-      super.getMenuButtonWrapper().setVisibility(isVisible ? View.GONE : View.VISIBLE);
+    if (this instanceof ToolbarPhone && super.getMenuButtonCoordinator() != null) {
+      super.getMenuButtonCoordinator().setVisibility(isVisible ? View.GONE : View.VISIBLE);
     }
   }
 
@@ -897,10 +898,10 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
   }
 
   @Override
-  View getMenuButtonWrapper() {
+  MenuButtonCoordinator getMenuButtonCoordinator() {
     if (this instanceof ToolbarPhone && BottomToolbarVariationManager.isMenuButtonOnBottom()) {
       return null;
     }
-    return super.getMenuButtonWrapper();
+    return super.getMenuButtonCoordinator();
   }
 }
