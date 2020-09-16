@@ -1,0 +1,12 @@
+diff --git a/content/browser/renderer_host/navigation_request.cc b/content/browser/renderer_host/navigation_request.cc
+index 6d2487d9d54a6a17cb17714f27591a89c19e8fb4..6a0579cdcde19a0d26ef60e785a1a9a70afd766d 100644
+--- a/content/browser/renderer_host/navigation_request.cc
++++ b/content/browser/renderer_host/navigation_request.cc
+@@ -2771,6 +2771,7 @@ void NavigationRequest::OnStartChecksComplete(
+   headers.MergeFrom(TakeModifiedRequestHeaders());
+   begin_params_->headers = headers.ToString();
+ 
++  BRAVE_ONSTARTCHECKSCOMPLETE_MAYBEHIDEREFERRER
+   // TODO(clamy): Avoid cloning the navigation params and create the
+   // ResourceRequest directly here.
+   std::vector<std::unique_ptr<NavigationLoaderInterceptor>> interceptor;
