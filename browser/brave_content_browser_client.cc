@@ -35,6 +35,7 @@
 #include "brave/components/ipfs/buildflags/buildflags.h"
 #include "brave/components/ipfs/features.h"
 #include "brave/components/speedreader/buildflags.h"
+#include "brave/components/private_channel/buildflags.h"
 #include "brave/grit/brave_generated_resources.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/profiles/profile.h"
@@ -107,6 +108,10 @@ using extensions::ChromeContentBrowserClientExtensionsPart;
 #include "brave/browser/brave_wallet/brave_wallet_service_factory.h"
 #include "brave/components/brave_wallet/common/brave_wallet_constants.h"
 #include "brave/components/brave_wallet/browser/brave_wallet_service.h"
+#endif
+
+#if BUILDFLAG(PRIVATE_CHANNEL_ENABLED)
+#include "brave/components/private_channel/client_private_channel.h"
 #endif
 
 namespace {
