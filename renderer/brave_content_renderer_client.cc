@@ -15,5 +15,15 @@ SetRuntimeFeaturesDefaultsBeforeBlinkInitialization() {
       SetRuntimeFeaturesDefaultsBeforeBlinkInitialization();
 
   blink::WebRuntimeFeatures::EnableSharedArrayBuffer(false);
+
+  // These features don't have dedicated WebRuntimeFeatures wrappers.
+  blink::WebRuntimeFeatures::EnableFeatureFromString("DigitalGoods", false);
+  // Need to disable NativeFileSystem feature here in addition to disabling
+  // blink::features::kNativeFileSystemAPI in brave_main_delegate.cc because
+  // this feature is not part of SetRuntimeFeaturesFromChromiumFeatures function
+  // and instead can only be turned on (not off) via kNativeFileSystemAPI in
+  // SetCustomizedRuntimeFeaturesFromCombinedArgs.
+  blink::WebRuntimeFeatures::EnableFeatureFromString("NativeFileSystem", false);
 }
+
 BraveContentRendererClient::~BraveContentRendererClient() = default;

@@ -18,12 +18,22 @@ bool IsTrialValid_ChromiumImpl(const StringView& trial_name);
 namespace blink {
 
 bool origin_trials::IsTrialValid(const StringView& trial_name) {
+  // When updating this list also update
+  //  * origin_trial_context.cc override and
+  //  * origin_trial_features_unittest.cc
   static const char* const kBraveDisabledTrialNames[] = {
+// [Not released yet]     "DigitalGoods",
+      "NativeFileSystem2",
+      "SignedExchangeSubresourcePrefetch",
       "SubresourceWebBundles",
-      "SignedExchangeSubresourcePrefetch"
   };
+
   if (base::Contains(kBraveDisabledTrialNames, trial_name))
     return false;
+  return origin_trials::IsTrialValid_ChromiumImpl(trial_name);
+}
+
+bool origin_trials::IsTrialValid_ForTests(const StringView& trial_name) {
   return origin_trials::IsTrialValid_ChromiumImpl(trial_name);
 }
 

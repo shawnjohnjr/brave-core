@@ -15,7 +15,13 @@ namespace blink {
 
 // AddFeature doesn't check if origin_trials::IsTrialValid.
 void OriginTrialContext::AddFeature(OriginTrialFeature feature) {
-  static const std::array<OriginTrialFeature, 2> kBraveDisabledTrialFeatures = {
+  // When updating this list also update the trials names below in
+  // AddForceEnabledTrials override as well as the names in
+  //  * origin_trials.cc override and
+  //  * origin_trial_features_unittest.cc
+  static const std::array<OriginTrialFeature, 3> kBraveDisabledTrialFeatures = {
+// [Not released yet]     OriginTrialFeature::kDigitalGoods,
+      OriginTrialFeature::kNativeFileSystem,
       OriginTrialFeature::kSubresourceWebBundles,
       OriginTrialFeature::kSignedExchangeSubresourcePrefetch,
   };
@@ -28,9 +34,14 @@ void OriginTrialContext::AddFeature(OriginTrialFeature feature) {
 // AddForceEnabledTrials only has a DCHECK with origin_trials::IsTrialValid.
 void OriginTrialContext::AddForceEnabledTrials(
     const Vector<String>& trial_names) {
+  // When updating this list also update
+  //  * origin_trials.cc override and
+  //  * origin_trial_features_unittest.cc
   static const char* const kBraveDisabledTrialNames[] = {
+// [Not released yet]     "DigitalGoods",
+      "NativeFileSystem2",
+      "SignedExchangeSubresourcePrefetch",
       "SubresourceWebBundles",
-      "SignedExchangeSubresourcePrefetch"
   };
 
   for (const auto* disabled_name : kBraveDisabledTrialNames) {
