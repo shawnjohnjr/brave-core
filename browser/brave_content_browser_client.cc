@@ -36,6 +36,7 @@
 #include "brave/components/ipfs/features.h"
 #include "brave/components/speedreader/buildflags.h"
 #include "brave/components/private_channel/buildflags.h"
+#include "brave/components/speedreader/buildflags.h"
 #include "brave/grit/brave_generated_resources.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/profiles/profile.h"
