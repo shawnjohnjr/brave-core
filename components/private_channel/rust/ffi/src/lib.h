@@ -2,6 +2,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 #ifndef BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_LIB_H_
 #define BRAVE_COMPONENTS_PRIVATE_CHANNEL_RUST_FFI_SRC_LIB_H_
 
@@ -15,10 +16,12 @@
 typedef struct {
   const uint8_t* encoded_partial_dec;
   uintptr_t encoded_partial_dec_size;
-  const uint8_t* encoded_proofs;
-  uintptr_t encoded_proofs_size;
+  const uint8_t* encoded_proofs_dec;
+  uintptr_t encoded_proofs_dec_size;
   const uint8_t* random_vec;
   uintptr_t random_vec_size;
+  const uint8_t* encoded_proofs_rand;
+  uintptr_t encoded_proofs_rand_size;
   bool error;
 } C_ResultSecondRound;
 

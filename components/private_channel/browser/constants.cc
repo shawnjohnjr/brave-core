@@ -7,6 +7,8 @@
 
 const int kMaxPrivateChannelServerResponseSizeBytes = 1024 * 1024;
 
+extern const char PRIVATE_CHANNEL_VERSION[] =
+    "30ee124d76368c52339c8d965d3a07c1db66a555";
 extern const char PRIVATE_CHANNEL_STAGING_SERVER[] =
     "https://repsys.rewards.brave.software";
 extern const char PRIVATE_CHANNEL_PRODUCTION_SERVER[] =

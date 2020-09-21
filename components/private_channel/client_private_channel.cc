@@ -50,8 +50,10 @@ SecondRoundArtefacts SecondRound(const char* enc_input,
 
   artefacts.partial_decryption = convert_to_str(
       results.encoded_partial_dec, results.encoded_partial_dec_size);
-  artefacts.proofs =
-      convert_to_str(results.encoded_proofs, results.encoded_proofs_size);
+  artefacts.dec_proofs = convert_to_str(results.encoded_proofs_rand,
+                                        results.encoded_proofs_rand_size);
+  artefacts.proofs = convert_to_str(results.encoded_proofs_dec,
+                                    results.encoded_proofs_dec_size);
   artefacts.rand_vec =
       convert_to_str(results.random_vec, results.random_vec_size);
   artefacts.error = results.error;

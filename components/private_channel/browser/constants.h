@@ -8,6 +8,7 @@
 
 extern const int kMaxPrivateChannelServerResponseSizeBytes;
 
+extern const char PRIVATE_CHANNEL_VERSION[];
 extern const char PRIVATE_CHANNEL_STAGING_SERVER[];
 extern const char PRIVATE_CHANNEL_PRODUCTION_SERVER[];
 extern const char PRIVATE_CHANNEL_DEVELOPMENT_SERVER[];

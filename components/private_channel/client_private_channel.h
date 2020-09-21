@@ -25,6 +25,7 @@ struct ChallengeArtefacts {
 struct SecondRoundArtefacts {
   std::string partial_decryption;
   std::string proofs;
+  std::string dec_proofs;
   std::string rand_vec;
   bool error;
 

@@ -107,15 +107,8 @@ void PrivateChannel::FirstRoundProtocol(std::string server_pk) {
   // TODO(gpestana): refactor and extract signals
   std::string s = "";
   const char* input[] = {
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
-      s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(), s.c_str(),
+      s.c_str(), s.c_str(), s.c_str(), s.c_str(),
   };
 
   int input_size = sizeof(input) / sizeof(input[0]);
@@ -129,10 +122,12 @@ void PrivateChannel::FirstRoundProtocol(std::string server_pk) {
   }
 
   const std::string payload = base::StringPrintf(
-      "pk_vector=%s&th_key_vector=%s&enc_signals=%s&client_id=%s",
+      "pk_vector=%s&th_key_vector=%s&enc_signals=%s&client_id=%s&checks_"
+      "version=%s",
       request_artefacts.client_pks.c_str(),
       request_artefacts.shared_pubkey.c_str(),
-      request_artefacts.encrypted_hashes.c_str(), referral_code_.c_str());
+      request_artefacts.encrypted_hashes.c_str(), referral_code_.c_str(),
+      PRIVATE_CHANNEL_VERSION);
 
   auto resource_request = std::make_unique<network::ResourceRequest>();
   resource_request->method = "POST";
@@ -218,10 +213,11 @@ void PrivateChannel::SecondRoundProtocol(const std::string& encrypted_input,
                                        encrypted_hashes_size, &client_sks[0]);
 
   const std::string payload = base::StringPrintf(
-      "rand_vec=%s&partial_dec=%s&proofs=%s&client_id=%s&stype=referral",
+      "rand_vec=%s&partial_dec=%s&rand_proofs=%s&dec_proofs=%s&client_id=%s",
       request_artefacts.rand_vec.c_str(),
       request_artefacts.partial_decryption.c_str(),
-      request_artefacts.proofs.c_str(), id.c_str());
+      request_artefacts.dec_proofs.c_str(), request_artefacts.proofs.c_str(),
+      id.c_str());
 
   if (request_artefacts.error) {
     LOG(ERROR) << "SecondRoundProtocol error. Stopping protocol.";
@@ -283,7 +279,6 @@ void PrivateChannel::OnPrivateChannelSecondRoundLoadComplete(
   const std::string safe_response_body =
       response_body ? *response_body : std::string();
 
-  http_loader_.reset();
   if (response_code < 200 || response_code > 299) {
     LOG(ERROR)
         << "Failed to run the second round of the private channels protocol"
