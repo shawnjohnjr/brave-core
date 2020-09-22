@@ -29,7 +29,7 @@ index 111807a9bdf6c740e98831b0b618efeb9972119a..2820848b25bc360f0275491e3b4b1e9a
  };
 
  class FlagsStateSingleton : public flags_ui::FlagsState::Delegate {
-@@ -6481,6 +6482,7 @@ bool SkipConditionalFeatureEntry(const flags_ui::FlagsStorage* storage,
+@@ -6482,6 +6483,7 @@ bool SkipConditionalFeatureEntry(const flags_ui::FlagsStorage* storage,
 
    if (flags::IsFlagExpired(storage, entry.internal_name))
      return true;
