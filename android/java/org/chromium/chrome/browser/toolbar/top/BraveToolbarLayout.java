@@ -876,7 +876,6 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
     }
   }
 
-  @Override
   public void onBottomToolbarVisibilityChanged(boolean isVisible) {
     if (this instanceof ToolbarPhone && super.getMenuButtonCoordinator() != null) {
       super.getMenuButtonCoordinator().setVisibility(isVisible ? View.GONE : View.VISIBLE);
