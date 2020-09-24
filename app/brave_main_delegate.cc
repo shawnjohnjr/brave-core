@@ -38,7 +38,6 @@
 #include "components/omnibox/common/omnibox_features.h"
 #include "components/password_manager/core/common/password_manager_features.h"
 #include "components/safe_browsing/core/features.h"
-#include "components/security_state/core/features.h"
 #include "components/sync/base/sync_base_switches.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "components/version_info/channel.h"
@@ -209,11 +208,8 @@ bool BraveMainDelegate::BasicStartupComplete(int* exit_code) {
       net::features::kLegacyTLSEnforced.name,
       // Remove URL bar mixed control and allow site specific override instead
       features::kMixedContentSiteSetting.name,
-      // Warn about Mixed Content optionally blockable content
-      security_state::features::kPassiveMixedContentWarning.name,
       // Enable webui dark theme: @media (prefers-color-scheme: dark) is gated
-      // on
-      // this feature.
+      // on this feature.
       features::kWebUIDarkMode.name,
       blink::features::kPrefetchPrivacyChanges.name,
       blink::features::kReducedReferrerGranularity.name,
