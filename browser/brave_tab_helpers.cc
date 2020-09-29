@@ -8,7 +8,7 @@
 #include "brave/browser/farbling/farbling_tab_helper.h"
 #include "brave/browser/tor/buildflags.h"
 #include "brave/browser/ui/bookmark/brave_bookmark_tab_helper.h"
-#include "brave/components/brave_ads/browser/ads_tab_helper.h"
+#include "brave/components/brave_ads/browser/buildflags/buildflags.h"
 #include "brave/components/brave_perf_predictor/browser/buildflags.h"
 #include "brave/components/brave_rewards/browser/buildflags/buildflags.h"
 #include "brave/components/brave_shields/browser/brave_shields_web_contents_observer.h"
@@ -49,6 +49,10 @@
 
 #if BUILDFLAG(ENABLE_BRAVE_PERF_PREDICTOR)
 #include "brave/components/brave_perf_predictor/browser/perf_predictor_tab_helper.h"
+#endif
+
+#if BUILDFLAG(BRAVE_ADS_ENABLED)
+#include "brave/browser/brave_ads/ads_tab_helper.h"
 #endif
 
 #if BUILDFLAG(ENABLE_SPEEDREADER)
@@ -107,7 +111,9 @@ void AttachTabHelpers(content::WebContents* web_contents) {
       web_contents);
 #endif
 
+#if BUILDFLAG(BRAVE_ADS_ENABLED)
   brave_ads::AdsTabHelper::CreateForWebContents(web_contents);
+#endif
 
 #if BUILDFLAG(ENABLE_SPEEDREADER)
   speedreader::SpeedreaderTabHelper::CreateForWebContents(web_contents);
