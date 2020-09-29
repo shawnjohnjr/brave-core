@@ -17,7 +17,6 @@
 #include "brave/browser/ntp_background_images/view_counter_service_factory.h"
 #include "brave/components/brave_wallet/buildflags/buildflags.h"
 #include "brave/components/playlist/buildflags/buildflags.h"
-#include "extensions/buildflags/buildflags.h"
 
 #if BUILDFLAG(ENABLE_PLAYLIST)
 #include "brave/browser/extensions/api/playlist/playlist_event_router.h"

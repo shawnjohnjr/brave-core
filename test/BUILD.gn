@@ -18,7 +18,6 @@ import("//brave/components/gemini/browser/buildflags/buildflags.gni")
 import("//brave/components/greaselion/browser/buildflags/buildflags.gni")
 import("//brave/components/ipfs/buildflags/buildflags.gni")
 import("//brave/components/moonpay/browser/buildflags/buildflags.gni")
-import("//brave/components/playlist/buildflags/buildflags.gni")
 import("//brave/components/speedreader/buildflags.gni")
 import("//brave/test/testing.gni")
 import("//components/gcm_driver/config.gni")
@@ -78,6 +77,13 @@ source_set("test_support") {
       "//components/sync_preferences",
     ]
   }
+}
+
+group("other_browser_tests") {
+  testonly = true
+  deps = [
+    "//brave/browser/playlist/test:browser_tests",
+  ]
 }
 
 test("brave_unit_tests") {
@@ -256,7 +262,7 @@ test("brave_unit_tests") {
     ]
     deps += [
       "//brave/components/crypto_dot_com/browser",
-    ]    
+    ]
   }
 
   if (is_linux) {
@@ -603,6 +609,7 @@ if (!is_android) {
     deps = [
       "//brave/components/ipfs/test:brave_ipfs_browser_tests",
       "//brave/browser/ui/tabs/test:browser_tests",
+      ":other_browser_tests",
     ]
 
     if (enable_widevine && !is_asan) {
@@ -653,7 +660,7 @@ if (!is_android) {
     }
 
     if (crypto_dot_com_enabled) {
-      sources += [ "//brave/components/crypto_dot_com/browser/crypto_dot_com_service_browsertest.cc" ]    
+      sources += [ "//brave/components/crypto_dot_com/browser/crypto_dot_com_service_browsertest.cc" ]
     }
 
     if (brave_rewards_enabled) {
