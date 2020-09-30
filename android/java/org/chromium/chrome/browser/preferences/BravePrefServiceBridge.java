@@ -84,6 +84,10 @@ public class BravePrefServiceBridge {
         return BravePrefServiceBridgeJni.get().getDataSaved(profile);
     }
 
+    public long getLastDataSaved(Profile profile) {
+        return BravePrefServiceBridgeJni.get().getLastDataSaved(profile);
+    }
+
     /**
      * @param whether SafetyNet check failed.
      */
@@ -161,6 +165,7 @@ public class BravePrefServiceBridge {
         long getTrackersBlockedCount(Profile profile);
         long getAdsBlockedCount(Profile profile);
         long getDataSaved(Profile profile);
+        long getLastDataSaved(Profile profile);
 
         // Used to pass total stat from upgrading old tabs based browser
         // to a new core based

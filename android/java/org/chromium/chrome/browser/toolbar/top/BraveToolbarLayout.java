@@ -80,6 +80,8 @@ import org.chromium.chrome.browser.brave_stats.BraveStatsUtil;
 import org.chromium.chrome.browser.settings.BraveSearchEngineUtils;
 import org.chromium.chrome.browser.notifications.retention.RetentionNotificationUtil;
 import org.chromium.chrome.browser.ntp.BraveNewTabPageLayout;
+import org.chromium.chrome.browser.preferences.PrefChangeRegistrar;
+import org.chromium.chrome.browser.preferences.BravePreferenceKeys;
 
 import java.net.URL;
 import java.util.List;
@@ -89,7 +91,8 @@ import java.util.Date;
 public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClickListener,
   View.OnLongClickListener,
   BraveRewardsObserver,
-  BraveRewardsNativeWorker.PublisherObserver {
+  BraveRewardsNativeWorker.PublisherObserver,
+  PrefChangeRegistrar.PrefObserver {
   public static final String PREF_HIDE_BRAVE_REWARDS_ICON = "hide_brave_rewards_icon";
 
   private static final long MB_10 = 10000000;
@@ -120,6 +123,7 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
   private boolean mIsRewardsEnabled;
 
   private PopupWindow mShieldsTooltipPopupWindow;
+  private PrefChangeRegistrar mPrefChangeRegistrar;
 
   public BraveToolbarLayout(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -135,6 +139,10 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
     if (mBraveRewardsNativeWorker != null) {
       mBraveRewardsNativeWorker.RemoveObserver(this);
       mBraveRewardsNativeWorker.RemovePublisherObserver(this);
+    }
+
+    if(mPrefChangeRegistrar != null) {
+      mPrefChangeRegistrar.destroy();
     }
   }
 
@@ -225,14 +233,6 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
           });
         }
       }
-
-      @Override
-      public void savedBandwidth(long savings) {
-        if (!isIncognito()
-            && OnboardingPrefManager.getInstance().isBraveStatsEnabled()) {
-          addSavedBandwidthToDb(savings);
-        }
-      }
     };
     // Initially show shields off image. Shields button state will be updated when tab is
     // shown and loading state is changed.
@@ -268,6 +268,9 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
       mBraveRewardsNativeWorker.AddPublisherObserver(this);
       mBraveRewardsNativeWorker.GetAllNotifications();
     }
+
+    mPrefChangeRegistrar = new PrefChangeRegistrar();
+    mPrefChangeRegistrar.addObserver(BravePreferenceKeys.BRAVE_LAST_BANDWIDTH_SAVED_BYTES, this);
   }
 
   @Override
@@ -903,4 +906,12 @@ public abstract class BraveToolbarLayout extends ToolbarLayout implements OnClic
     }
     return super.getMenuButtonWrapper();
   }
+
+  @Override
+    public void onPreferenceChange() {
+        if (!isIncognito()
+            && OnboardingPrefManager.getInstance().isBraveStatsEnabled()) {
+          addSavedBandwidthToDb(BravePrefServiceBridge.getInstance().getLastDataSaved(Profile.getLastUsedRegularProfile()));
+        }
+    }
 }
