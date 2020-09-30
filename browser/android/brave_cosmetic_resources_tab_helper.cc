@@ -24,6 +24,109 @@
 
 
 namespace {
+const char k_observing_script[] =
+    "(function() {"
+      "const queriedIds = new Set();"
+      "const queriedClasses = new Set();"
+      "var notYetQueriedClasses;"
+      "var notYetQueriedIds;"
+      "var cosmeticObserver;"
+      "const fetchNewClassIdRules = function () {"
+  "if ((!notYetQueriedClasses || notYetQueriedClasses.length === 0) &&"
+      "(!notYetQueriedIds || notYetQueriedIds.length === 0)) {"
+    "return;"
+  "};"
+  "cf_worker.testFunction(3);"
+  "/*chrome.runtime.sendMessage({"
+    "type: 'hiddenClassIdSelectors',"
+    "classes: notYetQueriedClasses || [],"
+    "ids: notYetQueriedIds || []"
+  "})*/"
+  "notYetQueriedClasses = [];"
+  "notYetQueriedIds = [];"
+"};"
+
+"function isElement (node) {"
+  "return (node.nodeType === 1);"
+"};"
+
+"function asElement (node) {"
+  "return isElement(node) ? node : null;"
+"};"
+
+"const handleMutations = MutationCallback = function (mutations) {"
+  "for (const aMutation of mutations) {"
+  //" console.log('!!!aMutation.type == ' + aMutation.type);"
+    "if (aMutation.type === 'attributes') {"
+      "const changedElm = aMutation.target;"
+      "switch (aMutation.attributeName) {"
+        "case 'class':"
+          "for (const aClassName of changedElm.classList.values()) {"
+            "if (queriedClasses.has(aClassName) === false) {"
+              "notYetQueriedClasses.push(aClassName);"
+              "queriedClasses.add(aClassName);"
+            "};"
+          "};"
+          "break;"
+        "case 'id':"
+          "const mutatedId = changedElm.id;"
+          "if (queriedIds.has(mutatedId) === false) {"
+            "notYetQueriedIds.push(mutatedId);"
+            "queriedIds.add(mutatedId);"
+          "};"
+          "break;"
+      "};"
+    "} else if (aMutation.addedNodes.length > 0) {"
+      "for (const node of aMutation.addedNodes) {"
+        "const element = asElement(node);"
+        "if (!element) {"
+          "continue;"
+        "};"
+        "const id = element.id;"
+        "if (id && !queriedIds.has(id)) {"
+          "notYetQueriedIds.push(id);"
+          "queriedIds.add(id);"
+        "};"
+        "const classList = element.classList;"
+        "if (classList) {"
+          "for (const className of classList.values()) {"
+            "if (className && !queriedClasses.has(className)) {"
+              "notYetQueriedClasses.push(className);"
+              "queriedClasses.add(className);"
+            "};"
+          "};"
+        "};"
+      "};"
+    "};"
+  "};"
+  "fetchNewClassIdRules();"
+"};"
+
+    "const startObserving = () => {"
+    "    const elmWithClassOrId = document.querySelectorAll('[class],[id]');"
+  " for (const elm of elmWithClassOrId) {"
+    " for (const aClassName of elm.classList.values()) {"
+      " queriedClasses.add(aClassName);"
+      " /*console.log('!!!aClassName == ' + aClassName);*/"
+    "}"
+    " const elmId = elm.getAttribute('id');"
+    " if (elmId) {"
+      " queriedIds.add(elmId);"
+    " }"
+  "};"
+  "notYetQueriedClasses = Array.from(queriedClasses);"
+  "notYetQueriedIds = Array.from(queriedIds);"
+  "fetchNewClassIdRules();"
+  "cosmeticObserver = new MutationObserver(handleMutations);"
+  "let observerConfig = {"
+    "subtree: true,"
+    "childList: true,"
+    "attributeFilter: ['id', 'class']"
+  "};"
+  "cosmeticObserver.observe(document.documentElement, observerConfig);"
+  "};"
+  "startObserving();"
+    "})();";
 bool ShouldDoCosmeticFiltering(content::WebContents* contents,
     const GURL& url) {
   Profile* profile = Profile::FromBrowserContext(contents->GetBrowserContext());
@@ -97,7 +200,8 @@ BraveCosmeticResourcesTabHelper::~BraveCosmeticResourcesTabHelper() {
 
 void BraveCosmeticResourcesTabHelper::ProcessURL(
     content::WebContents* contents,
-    content::RenderFrameHost* render_frame_host, const GURL& url) {
+    content::RenderFrameHost* render_frame_host, const GURL& url,
+    const bool& main_frame) {
   if (!ShouldDoCosmeticFiltering(contents, url)) {
     return;
   }
@@ -105,19 +209,27 @@ void BraveCosmeticResourcesTabHelper::ProcessURL(
       PostTaskAndReplyWithResult(FROM_HERE,
           base::BindOnce(&GetUrlCosmeticResourcesOnTaskRunner, url.spec()),
           base::BindOnce(&GetUrlCosmeticResourcesOnUI, render_frame_host));
+  if (!main_frame)
+    return;
+  // Non-scriptlet cosmetic filters are only applied on the top-level frame
+  if (web_contents()->GetMainFrame()) {
+    web_contents()->GetMainFrame()->ExecuteJavaScriptInIsolatedWorld(
+        base::UTF8ToUTF16(k_observing_script),
+        base::NullCallback(), ISOLATED_WORLD_ID_CHROME_INTERNAL);
+  }
 }
 
 void BraveCosmeticResourcesTabHelper::DidFinishNavigation(
     content::NavigationHandle* navigation_handle) {
   ProcessURL(web_contents(), web_contents()->GetMainFrame(),
-      web_contents()->GetLastCommittedURL());
+      web_contents()->GetLastCommittedURL(), true);
 }
 
 void BraveCosmeticResourcesTabHelper::ResourceLoadComplete(
     content::RenderFrameHost* render_frame_host,
     const content::GlobalRequestID& request_id,
     const blink::mojom::ResourceLoadInfo& resource_load_info) {
-  ProcessURL(web_contents(), render_frame_host, resource_load_info.final_url);
+  ProcessURL(web_contents(), render_frame_host, resource_load_info.final_url, false);
 }
 
 WEB_CONTENTS_USER_DATA_KEY_IMPL(BraveCosmeticResourcesTabHelper)

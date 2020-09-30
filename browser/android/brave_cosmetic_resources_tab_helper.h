@@ -30,7 +30,8 @@ class BraveCosmeticResourcesTabHelper
 
  private:
   void ProcessURL(content::WebContents* contents,
-      content::RenderFrameHost* render_frame_host, const GURL& url);
+      content::RenderFrameHost* render_frame_host, const GURL& url,
+      const bool& main_frame);
   DISALLOW_COPY_AND_ASSIGN(BraveCosmeticResourcesTabHelper);
 };
 

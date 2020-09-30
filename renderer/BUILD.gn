@@ -19,4 +19,11 @@ source_set("renderer") {
     "//brave/components/content_settings/renderer",
     "//third_party/blink/public:blink",
   ]
+
+  if (is_android) {
+    deps += [
+      "//chrome/common",
+      "//brave/components/cosmetic_filters/content/renderer",
+    ]
+  }
 }
