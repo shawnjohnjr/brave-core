@@ -76,6 +76,7 @@ declare namespace NewTab {
   export interface PersistentState {
     togetherSupported: boolean
     geminiSupported: boolean
+    binanceSupported: boolean
     bitcoinDotComSupported: boolean
     cryptoDotComSupported: boolean
     showEmptyPage: boolean
@@ -143,7 +144,6 @@ declare namespace NewTab {
     initialAmount: string
     initialAsset: string
     userTLDAutoSet: boolean
-    binanceSupported: boolean
     accountBalances: Record<string, string>
     authInProgress: boolean
     assetBTCValues: Record<string, string>
