@@ -79,13 +79,6 @@ source_set("test_support") {
   }
 }
 
-group("other_browser_tests") {
-  testonly = true
-  deps = [
-    "//brave/browser/playlist/test:browser_tests",
-  ]
-}
-
 test("brave_unit_tests") {
   testonly = true
 
@@ -607,9 +600,9 @@ if (!is_android) {
     }
 
     deps = [
-      "//brave/components/ipfs/test:brave_ipfs_browser_tests",
+      "//brave/browser/playlist/test:browser_tests",
       "//brave/browser/ui/tabs/test:browser_tests",
-      ":other_browser_tests",
+      "//brave/components/ipfs/test:brave_ipfs_browser_tests",
     ]
 
     if (enable_widevine && !is_asan) {
@@ -727,12 +720,6 @@ if (!is_android) {
       ]
       deps += [
         "//brave/components/ipfs",
-      ]
-    }
-
-    if (enable_playlist) {
-       sources += [
-        "//brave/browser/playlist/playlist_browsertest.cc",
       ]
     }
 
