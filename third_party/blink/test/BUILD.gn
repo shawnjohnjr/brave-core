@@ -1,0 +1,55 @@
+# Copyright (c) 2020 The Brave Authors. All rights reserved.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this file,
+# You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import("//testing/test.gni")
+
+test("content_browser_tests") {
+  testonly = true
+
+  # Needs to depend on:
+  # //content/browser
+  check_includes = false
+
+  sources = [
+    "//content/browser/loader/prefetch_browsertest_base.cc",
+    "//content/browser/loader/prefetch_browsertest_base.h",
+    "sxg_prefetch_browsertest.cc",
+  ]
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  deps = [
+    "//base/test:test_support",
+    "//content/public/browser",
+    "//content/shell:content_shell_lib",
+    "//content/test:browsertest_support",
+    "//content/test:test_support",
+    "//net:test_support",
+  ]
+}
+
+source_set("browser_tests") {
+  testonly = true
+
+  sources = [
+    "digital_goods_api_browsertest.cc",
+    # [Available in Cr87]
+    # "direct_sockets_api_browsertest.cc",
+    "native_file_system_api_browsertest.cc",
+    "subresource_web_bundles_browsertest.cc",
+  ]
+
+  defines = [ "HAS_OUT_OF_PROC_TEST_RUNNER" ]
+
+  deps = [
+    "//base/test:test_support",
+    "//brave/common",
+    "//chrome/browser/ui",
+    "//chrome/test:test_support_ui",
+    "//components/web_package:test_support",
+    "//net:test_support",
+    "//ui/shell_dialogs",
+  ]
+}

@@ -95,7 +95,7 @@ TEST_F(OriginTrialFeaturesTest, TestBlinkRuntimeFeaturesViaOriginTrials) {
 
 TEST_F(OriginTrialFeaturesTest, TestBlinkRuntimeFeaturesWithoutOriginTrials) {
   // The following don't currently have origin trials associated with them,
-  // but if they end up having them we should be able to catch here.
+  // but if they end up having them we should be able to catch it here.
   RuntimeEnabledFeatures::SetDigitalGoodsEnabled(false);
   // [Available in Cr87] RuntimeEnabledFeatures::SetDirectSocketsEnabled(false);
   RuntimeEnabledFeatures::SetLangClientHintHeaderEnabled(false);

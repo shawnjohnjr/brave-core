@@ -1,0 +1,12 @@
+diff --git a/content/shell/browser/shell_permission_manager.cc b/content/shell/browser/shell_permission_manager.cc
+index 23533f8455653a0362db4b451cdbbdc9b8ca61fd..f918f4f29a9e2b20caec3cdb29b9e2124842d4dd 100644
+--- a/content/shell/browser/shell_permission_manager.cc
++++ b/content/shell/browser/shell_permission_manager.cc
+@@ -56,6 +56,7 @@ bool IsWhitelistedPermissionType(PermissionType permission) {
+     case PermissionType::CAMERA_PAN_TILT_ZOOM:
+     case PermissionType::WINDOW_PLACEMENT:
+     case PermissionType::FONT_ACCESS:
++    BRAVE_PERMISSION_TYPES
+       return false;
+   }
+ 
