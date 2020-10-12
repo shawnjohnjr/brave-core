@@ -59,6 +59,7 @@ class BraveReferralsService {
   void GetFirstRunTime();
   void GetFirstRunTimeDesktop();
   void PerformFinalizationChecks();
+  void PerformPrivateAttestation();
   base::FilePath GetPromoCodeFileName() const;
   void ReadPromoCode();
   void DeletePromoCodeFile() const;

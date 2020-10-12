@@ -122,7 +122,7 @@ void PrivateChannel::FirstRoundProtocol(std::string server_pk) {
   }
 
   const std::string payload = base::StringPrintf(
-      "pk_vector=%s&th_key_vector=%s&enc_signals=%s&client_id=%s&checks_"
+      "pk_vector=%s&th_key_vector=%s&enc_signals=%s&client_id=%s&"
       "version=%s",
       request_artefacts.client_pks.c_str(),
       request_artefacts.shared_pubkey.c_str(),
@@ -286,9 +286,12 @@ void PrivateChannel::OnPrivateChannelSecondRoundLoadComplete(
         << ", response code: " << response_code
         << ", payload: " << safe_response_body
         << ", url: " << http_loader_->GetFinalURL().spec();
+
+    http_loader_.reset();
     return;
   }
 
+  http_loader_.reset();
   VLOG(1) << "PrivateChannel: Protocol successful";
 }
 

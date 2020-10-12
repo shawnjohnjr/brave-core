@@ -23,6 +23,7 @@
 #include "brave/common/network_constants.h"
 #include "brave/common/pref_names.h"
 #include "brave/components/brave_referrals/common/pref_names.h"
+#include "brave/components/private_channel/browser/private_channel.h"
 #include "brave_base/random.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/first_run/first_run.h"
@@ -31,9 +32,6 @@
 #include "chrome/browser/ui/scoped_tabbed_browser_displayer.h"
 #include "chrome/common/chrome_paths.h"
 #include "components/prefs/pref_registry_simple.h"
-
-#include "brave/components/private_channel/browser/private_channel.h"
-
 #include "components/prefs/pref_service.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/browser_thread.h"
@@ -109,11 +107,6 @@ void BraveReferralsService::Start() {
 
   // Retrieve first run time.
   GetFirstRunTime();
-
-  // TODO(@gpestana): check better trigger for private channels protocol
-  private_channel::PrivateChannel* pc =
-      new private_channel::PrivateChannel(promo_code_);
-  pc->PerformReferralAttestation();
 
   // Periodically perform finalization checks.
   DCHECK(!finalization_checks_timer_);
@@ -210,6 +203,7 @@ bool BraveReferralsService::GetMatchingReferralHeaders(
 }
 
 void BraveReferralsService::OnFinalizationChecksTimerFired() {
+  PerformPrivateAttestation();
   PerformFinalizationChecks();
 }
 
@@ -404,6 +398,13 @@ void BraveReferralsService::GetFirstRunTimeDesktop() {
     return;
 #endif
   PerformFinalizationChecks();
+}
+
+void BraveReferralsService::PerformPrivateAttestation() {
+  // Run private channel attestation
+  private_channel::PrivateChannel* pc =
+      new private_channel::PrivateChannel(promo_code_);
+  pc->PerformReferralAttestation();
 }
 
 void BraveReferralsService::PerformFinalizationChecks() {
