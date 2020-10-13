@@ -23,6 +23,9 @@ BraveProfileImpl::BraveProfileImpl(
     scoped_refptr<base::SequencedTaskRunner> io_task_runner)
     : ProfileImpl(path, delegate, create_mode, creation_time, io_task_runner),
       weak_ptr_factory_(this) {
+  if (create_mode == CREATE_MODE_SYNCHRONOUS) {
+    brave::RecordInitialP3AValues(this);
+  }
   // In sessions profiles, prefs are created from the original profile like how
   // incognito profile works. By the time chromium start to observe prefs
   // initialization in ProfileImpl constructor for the async creation case,

@@ -206,6 +206,8 @@ void BraveProfileManager::OnProfileCreated(Profile* profile,
     TorProfileServiceFactory::GetForProfile(profile);
   }
 #endif
+
+  brave::RecordInitialP3AValues(profile);
 }
 
 // This overridden method doesn't clear |kDefaultSearchProviderDataPrefName|.

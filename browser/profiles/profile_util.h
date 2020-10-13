@@ -49,6 +49,12 @@ bool IsRegularProfile(content::BrowserContext* profile);
 
 bool IsTorDisabledForProfile(Profile* profile);
 
+// Records default values for some histograms.
+//
+// For profile agnostic values (ex: local_state) see
+// browser/brave_browser_main_extra_parts.cc
+void RecordInitialP3AValues(Profile* profile);
+
 }  // namespace brave
 
 namespace chrome {

@@ -11,13 +11,18 @@
 
 #include "base/files/file_path.h"
 #include "base/memory/ptr_util.h"
+#include "base/metrics/histogram_macros.h"
 #include "base/no_destructor.h"
 #include "brave/browser/tor/buildflags.h"
 #include "brave/common/tor/tor_constants.h"
+#include "brave/components/ntp_background_images/common/pref_names.h"
 #include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/browser/profiles/profile_key.h"
 #include "chrome/browser/profiles/profile_manager.h"
+#include "components/prefs/pref_service.h"
+
+using namespace ntp_background_images::prefs;
 
 #if BUILDFLAG(ENABLE_TOR)
 #include "brave/browser/tor/tor_profile_service.h"
@@ -213,6 +218,13 @@ bool IsRegularProfile(content::BrowserContext* context) {
   return !IsTorProfile(context) &&
          !profile->IsGuestSession() &&
          profile->IsRegularProfile();
+}
+
+void RecordInitialP3AValues(Profile* profile) {
+  bool is_sponsored_image_enabled = profile->GetPrefs()->GetBoolean(
+      kNewTabPageShowSponsoredImagesBackgroundImage);
+  UMA_HISTOGRAM_BOOLEAN("Brave.NTP.SponsoredImagesEnabled",
+                        is_sponsored_image_enabled);
 }
 
 }  // namespace brave

@@ -83,6 +83,11 @@ constexpr const char* kCollectedHistograms[] = {
     "Brave.Sync.Status",
     "Brave.Uptime.BrowserOpenMinutes",
     "Brave.Welcome.InteractionStatus",
+    "Brave.NTP.NewTabsCreated",
+    "Brave.NTP.SponsoredImagesEnabled",
+    "Brave.NTP.SponsoredNewTabsCreated",
+    "Brave.NTP.CustomizeUsageStatus",
+
     // P2A
     // Ad Opportunities
     "Brave.P2A.TotalAdOpportunities",
