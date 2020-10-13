@@ -106,6 +106,7 @@ const Config = function () {
   this.mac_installer_signing_identifier = getNPMConfig(['mac_installer_signing_identifier']) || ''
   this.mac_signing_keychain = getNPMConfig(['mac_signing_keychain']) || 'login'
   this.mac_signing_output_prefix = 'signing'
+  this.sparkleEdDSAKey = getNPMConfig(['sparkle_eddsa_key']) || ''
   this.notary_user = getNPMConfig(['notary_user']) || ''
   this.notary_password = getNPMConfig(['notary_password']) || ''
   this.channel = 'development'
@@ -222,6 +223,7 @@ Config.prototype.buildArgs = function () {
     enable_cdm_host_verification: this.enableCDMHostVerification(),
     skip_signing: !this.shouldSign(),
     chrome_pgo_phase: this.chromePgoPhase,
+    sparkle_eddsa_key: this.sparkleEdDSAKey,
     // When enabled (see third_party/blink/renderer/config.gni), we end up with
     // multiple files giving compilation error similar to:
     // gen/third_party/blink/renderer/bindings/modules/v8/v8_shared_worker_global_scope.cc:4614:34:
@@ -256,7 +258,7 @@ Config.prototype.buildArgs = function () {
     args.tag_ap = this.tag_ap
   }
 
-  if (process.platform === 'win32' && this.build_delta_installer) {
+  if ((process.platform === 'win32' || process.platform === 'darwin') && this.build_delta_installer) {
     assert(this.last_chrome_installer, 'Need last_chrome_installer args for building delta installer')
     args.build_delta_installer = true
     args.last_chrome_installer = this.last_chrome_installer
