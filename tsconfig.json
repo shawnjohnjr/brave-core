@@ -33,7 +33,7 @@
     "noImplicitReturns": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": false
   },
   "include": []
 }

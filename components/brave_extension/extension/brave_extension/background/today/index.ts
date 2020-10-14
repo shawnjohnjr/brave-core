@@ -35,7 +35,8 @@ function performUpdateFeed() {
         console.log('Got feed', feedContents)
         memoryTodayData = await feedToData(feedContents)
         resolve()
-        chrome.storage.local.set({ today: memoryTodayData })
+        // console.log('setting today feed data', memoryTodayData)
+        // chrome.storage.local.set({ today: memoryTodayData })
       } else {
         throw new Error(`Not ok when fetching feed. Status ${feedResponse.status} (${feedResponse.statusText})`)
       }
@@ -75,6 +76,8 @@ async function updateFeed() {
 import MessageTypes = Background.MessageTypes.Today
 import Messages = BraveToday.Messages
 
+console.error('today hi')
+
 Background.setListener<void>(
   MessageTypes.indicatingOpen,
   async function (payload, sender) {
@@ -100,6 +103,7 @@ Background.setListener<Messages.GetFeedResponse>(
 Background.setListener<Messages.GetFeedImageDataResponse, Messages.GetFeedImageDataPayload>(
   MessageTypes.getFeedImageData,
   async function (req, sender, sendResponse) {
+    console.log('asked for image')
     const blob = await fetch(req.url).then(r => r.blob());
     const dataUrl: string = await new Promise(resolve => {
       let reader = new FileReader();

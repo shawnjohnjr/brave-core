@@ -3,18 +3,21 @@ import { init } from '../../actions/new_tab_actions'
 import * as Actions from '../../actions/today_actions'
 
 export type BraveTodayState = {
+  // Are we in the middle of checking for new data
   isFetching: boolean | string
+  // How many pages have been displayed so far for the current data
   currentPageIndex: number
-  pagedContent: BraveToday.Page[]
-  initialSponsor?: BraveToday.Article
-  initialHeadline?: BraveToday.Article
-  initialDeals?: BraveToday.Deal[]
+  // Feed data
+  feed?: BraveToday.Feed
+  // pagedContent: BraveToday.Page[]
+  // initialSponsor?: BraveToday.Article
+  // initialHeadline?: BraveToday.Article
+  // initialDeals?: BraveToday.Deal[]
 }
 
 const defaultState: BraveTodayState = {
   isFetching: true,
   currentPageIndex: 0,
-  pagedContent: [],
 }
 
 const reducer = createReducer<BraveTodayState>({}, defaultState)

@@ -47,7 +47,7 @@ function generateFeedProperties (
 
 export default async function getBraveTodayData (
   feedContent: BraveToday.ContentFromFeed[]
-): Promise<BraveToday.Feed> {
+): Promise<BraveToday.Feed | undefined> {
   // const BraveTodayWhitelist = getBraveTodayWhitelist(topSites)
   const sponsors: (BraveToday.Article)[] = []
   const deals: (BraveToday.Deal)[] = []
@@ -69,6 +69,18 @@ export default async function getBraveTodayData (
 
   articles = await weightArticles(articles)
 
+  // Get unique categories present
+  // const categoryCounts = new Map<string, number>()
+  // for (const article of articles) {
+  //   if (article.category) {
+  //     const existingCount = categoryCounts.get(article.category) || 0
+  //     categoryCounts.set(article.category, existingCount + 1)
+  //   }
+  // }
+  // Ordered by # of occurances
+  // const categoriesByPriority = Array.from(categoryCounts.keys()).sort((a, b) =>
+  //   categoryCounts[a] - categoryCounts[b])
+
   // .sponsor,
   // .headline(paired: false),
   // .deals,
@@ -79,7 +91,13 @@ export default async function getBraveTodayData (
   // generate as many pages of content as possible
   const pages: BraveToday.Page[] = []
   let canGenerateAnotherPage = true
+  // Sanity check: arbitrary max pages so we don't end up
+  // in infinit loop.
+  const maxPages = 4000;
+  let curPage = 0;
   while (canGenerateAnotherPage) {
+    curPage++
+    if (curPage > maxPages) break
     const nextPage = generateNextPage(articles, deals)
     if (!nextPage) {
       canGenerateAnotherPage = false
@@ -100,7 +118,7 @@ function getArticleHasImage (article: BraveToday.Article) {
   return !!article.img
 }
 
-function generateNextPage (articles: BraveToday.Article[], allDeals: BraveToday.Deal[]): BraveToday.Page {
+function generateNextPage (articles: BraveToday.Article[], allDeals: BraveToday.Deal[]): BraveToday.Page | null {
   // .repeating([.headline(paired: false)], times: 2),
   // .repeating([.headline(paired: true)], times: 2),
   // .categoryGroup,
@@ -115,6 +133,9 @@ function generateNextPage (articles: BraveToday.Article[], allDeals: BraveToday.
 
   // Collect headlines
   const headlines = take(articles, getArticleHasImage, 16)
+  if (!headlines) {
+    return null
+  }
   const categoryInfo = generateArticleCategoryGroup(articles)
   const deals = allDeals.splice(0, 3)
   const publisherInfo = generateArticleSourceGroup(articles)

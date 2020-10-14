@@ -22,7 +22,8 @@ interface State {
 interface Props {
   feed?: BraveToday.Feed
   setOpacityForItems: (opacity: boolean) => void
-  onAnotherPageNeeded: () => void
+  onAnotherPageNeeded: () => any
+  displayedPageCount: number
 }
 
 class BraveToday extends React.PureComponent<Props, State> {
@@ -93,6 +94,8 @@ class BraveToday extends React.PureComponent<Props, State> {
       return null
     }
 
+    const displayedPageCount = Math.min(this.props.displayedPageCount, feed.pages.length)
+
     return (
       <BraveTodayElement.Section>
         <div
@@ -108,18 +111,12 @@ class BraveToday extends React.PureComponent<Props, State> {
         <CardDeals content={feed.featuredDeals} />
         {
           /* Infinitely repeating collections of content. */
-          Array.from({ length: this.state.contentPage }).map((_: {}, index: number) => {
+          Array(displayedPageCount).fill(undefined).map((_: undefined, index: number) => {
             return (
               <>
                 <CardsGroup
                   key={`cards-group-key-${index}`}
-                  content={feed.scrollingList}
-                  // The set of items from a single publisher to be featured in a list
-                  featuredPublisher={this.featuredPublisher}
-                  // The categorized items that are shown in each interaction
-                  featuredCategory={this.featuredCategory}
-                  // See https://docs.google.com/document/d/1guIG4Dw0l6REaOclcDjX7acxsDjk_oJlMvLyhD1KDxY/
-                  parentIndex={index}
+                  content={feed.pages[index]}
                 />
               </>
             )
