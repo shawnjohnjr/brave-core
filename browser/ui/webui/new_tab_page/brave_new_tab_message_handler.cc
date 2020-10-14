@@ -27,6 +27,8 @@
 #include "brave/components/ntp_background_images/browser/url_constants.h"
 #include "brave/components/ntp_background_images/browser/view_counter_service.h"
 #include "brave/components/ntp_background_images/common/pref_names.h"
+#include "brave/components/p3a/brave_p3a_utils.h"
+#include "chrome/browser/browser_process.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/chrome_features.h"
 #include "components/prefs/pref_change_registrar.h"
@@ -240,6 +242,11 @@ void BraveNewTabMessageHandler::RegisterMessages() {
     base::BindRepeating(
       &BraveNewTabMessageHandler::HandleGetBrandedWallpaperData,
       base::Unretained(this)));
+  web_ui()->RegisterMessageCallback(
+    "customizeClicked",
+    base::BindRepeating(
+      &BraveNewTabMessageHandler::HandleCustomizeClicked,
+      base::Unretained(this)));
 }
 
 void BraveNewTabMessageHandler::OnJavascriptAllowed() {
@@ -370,6 +377,8 @@ void BraveNewTabMessageHandler::HandleSaveNewTabPagePref(
     LOG(ERROR) << "Invalid input";
     return;
   }
+  brave::MaybeRecordNTPCustomizeUsageP3A(brave::kOpenedAndEdited,
+      g_browser_process->local_state());
   PrefService* prefs = profile_->GetPrefs();
   // Collect args
   std::string settingsKeyInput = args->GetList()[0].GetString();
@@ -484,6 +493,13 @@ void BraveNewTabMessageHandler::HandleGetBrandedWallpaperData(
   }
 
   ResolveJavascriptCallback(args->GetList()[0], std::move(data));
+}
+
+void BraveNewTabMessageHandler::HandleCustomizeClicked(
+    const base::ListValue* args) {
+  AllowJavascript();
+  brave::MaybeRecordNTPCustomizeUsageP3A(brave::kOpened,
+      g_browser_process->local_state());
 }
 
 void BraveNewTabMessageHandler::OnPrivatePropertiesChanged() {

@@ -10,6 +10,8 @@ namespace brave {
 
 extern const char kP3AEnabled[];
 extern const char kP3ANoticeAcknowledged[];
+extern const char kShieldUsageStatus[];
+extern const char kNTPCustomizeUsageStatus[];
 
 }  // namespace brave
 
