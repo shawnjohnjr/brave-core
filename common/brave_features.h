@@ -19,6 +19,8 @@ extern const base::Feature kBraveRewards;
 
 extern const base::Feature kGlobalPrivacyControl;
 
+extern const base::Feature kContextualAdsControl;
+
 }  // namespace features
 
 #endif  // BRAVE_COMMON_BRAVE_FEATURES_H_

@@ -67,6 +67,11 @@
 #include "base/system/sys_info.h"
 #endif
 
+#include "base/feature_list.h"
+#include "base/metrics/field_trial.h"
+#include "base/metrics/field_trial_params.h"
+#include "brave/common/brave_features.h"
+
 namespace ads {
 
 using std::placeholders::_1;
@@ -216,6 +221,11 @@ void AdsImpl::InitializeStep6(
   callback(SUCCESS);
 
   ReconcileAdRewards();
+
+  int32_t clfs = GetFieldTrialParamByFeatureAsInt(
+    ::features::kContextualAdsControl,
+    "classification_history_size", 999);
+  VLOG(1) << "*** DEBUG: feature param value is " << clfs;
 
   subdivision_targeting_->MaybeFetchForCurrentLocale();
 

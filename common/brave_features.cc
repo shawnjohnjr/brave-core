@@ -25,4 +25,9 @@ const base::Feature kBraveRewards{"BraveRewards",
 const base::Feature kGlobalPrivacyControl{"GlobalPrivacyControl",
                                           base::FEATURE_DISABLED_BY_DEFAULT};
 
+// Controls behaviour of the contextual ad matching mechanism, e.g. by
+// adjusting the number of page classifications used to infer user interest.
+const base::Feature kContextualAdsControl{
+    "ContextualAdsControl", base::FEATURE_DISABLED_BY_DEFAULT};
+
 }  // namespace features
