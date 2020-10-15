@@ -9,6 +9,7 @@ export type BraveTodayState = {
   currentPageIndex: number
   // Feed data
   feed?: BraveToday.Feed
+  publishers?: BraveToday.Publishers
   // pagedContent: BraveToday.Page[]
   // initialSponsor?: BraveToday.Article
   // initialHeadline?: BraveToday.Article
@@ -39,6 +40,7 @@ reducer.on(Actions.dataReceived, (state, payload) => {
     ...state,
     isFetching: false,
     feed: payload.feed,
+    publishers: payload.publishers,
     // Reset page index to ask for, even if we have current paged
     // content since feed might be new content.
     currentPageIndex: 0

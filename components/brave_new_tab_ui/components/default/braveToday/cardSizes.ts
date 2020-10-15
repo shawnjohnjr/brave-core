@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import styled from 'brave-ui/theme'
+import styled, { css } from 'brave-ui/theme'
 import {
   Block as StandardBlock,
   Heading as StandardHeading,
@@ -26,18 +26,24 @@ export const Small = styled(Large)`
   min-height: 310px;
 `
 
+export const DealsCard = styled(StandardBlock)`
+
+`
+
+
 export const Content = styled<{}, 'div'>('div')`
   box-sizing: border-box;
   padding: 25px 35px;
 `
 interface StandardImageProps {
   size: 'large' | 'medium' | 'small'
+  fit: boolean | undefined
 }
 
 export const Image = styled<StandardImageProps, any>(StandardImage)`
   width: 100%;
   min-height: ${p => p.size === 'large' ? '200px' : p.size === 'medium' ? '150px' : null};
-  object-fit: contain;
+  ${p => p.fit && css`object-fit: contain;`}
   background-color: rgba(188,188,188,0.2);
 `
 
@@ -76,4 +82,8 @@ export const ContainerForTwo = styled<{}, 'div'>('div')`
 
 export const ContainerForThree = styled(ContainerForTwo)`
   grid-template-columns: 1fr 1fr 1fr;
+`
+
+export const DealItem = styled('a')`
+  display: block;
 `
