@@ -286,7 +286,7 @@ IN_PROC_BROWSER_TEST_F(
 
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), "duckduckgo.com"),
-      rewards_browsertest_util::ContributionType::OneTimeTip,
+      rewards_browsertest_util::TipAction::OneTime,
       1);
 }
 
@@ -298,7 +298,7 @@ IN_PROC_BROWSER_TEST_F(
 
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), "brave.com"),
-      rewards_browsertest_util::ContributionType::OneTimeTip);
+      rewards_browsertest_util::TipAction::OneTime);
 }
 
 IN_PROC_BROWSER_TEST_F(
@@ -309,7 +309,7 @@ IN_PROC_BROWSER_TEST_F(
 
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), "duckduckgo.com"),
-      rewards_browsertest_util::ContributionType::MonthlyTip,
+      rewards_browsertest_util::TipAction::SetMonthly,
       1);
 }
 
@@ -321,7 +321,7 @@ IN_PROC_BROWSER_TEST_F(
 
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), "brave.com"),
-      rewards_browsertest_util::ContributionType::MonthlyTip);
+      rewards_browsertest_util::TipAction::SetMonthly);
 }
 
 // Check pending contributions
@@ -336,7 +336,7 @@ IN_PROC_BROWSER_TEST_F(
   // Tip unverified publisher
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), publisher),
-      rewards_browsertest_util::ContributionType::OneTimeTip);
+      rewards_browsertest_util::TipAction::OneTime);
 
   // Check that link for pending is shown and open modal
   rewards_browsertest_util::WaitForElementThenClick(
@@ -813,7 +813,7 @@ IN_PROC_BROWSER_TEST_F(
 
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), "duckduckgo.com"),
-      rewards_browsertest_util::ContributionType::MonthlyTip,
+      rewards_browsertest_util::TipAction::SetMonthly,
       1);
 
   base::RunLoop run_loop_second;
@@ -843,7 +843,7 @@ IN_PROC_BROWSER_TEST_F(
   contribution_->AddBalance(promotion_->ClaimPromotionViaCode());
   contribution_->TipPublisher(
       rewards_browsertest_util::GetUrl(https_server_.get(), "duckduckgo.com"),
-      rewards_browsertest_util::ContributionType::MonthlyTip,
+      rewards_browsertest_util::TipAction::SetMonthly,
       1);
 
   base::RunLoop run_loop_second;
@@ -867,7 +867,7 @@ IN_PROC_BROWSER_TEST_F(
       rewards_browsertest_util::GetUrl(
           https_server_.get(),
           "kjozwiakstaging.github.io"),
-      rewards_browsertest_util::ContributionType::OneTimeTip,
+      rewards_browsertest_util::TipAction::OneTime,
       2,
       1);
 
@@ -896,8 +896,8 @@ IN_PROC_BROWSER_TEST_F(
 
 IN_PROC_BROWSER_TEST_F(
     RewardsContributionBrowserTest,
-    PanelDefaultMonthlyTipChoices) {
-  rewards_browsertest_helper::EnableRewards(browser());
+    PanelMonthlyTipAmount) {
+  rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
   contribution_->AddBalance(promotion_->ClaimPromotionViaCode());
 
   rewards_browsertest_util::NavigateToPublisherPage(
@@ -913,11 +913,52 @@ IN_PROC_BROWSER_TEST_F(
       0,
       true);
 
+  // Verify current tip amount displayed on panel
   content::WebContents* popup =
       rewards_browsertest_helper::OpenRewardsPopup(browser());
-  const auto tip_options = rewards_browsertest_util::GetRewardsPopupTipOptions(
-      popup);
-  ASSERT_EQ(tip_options, std::vector<double>({ 0, 1, 10, 100 }));
+  const double tip_amount =
+      rewards_browsertest_util::GetRewardsPopupMonthlyTipValue(popup);
+  ASSERT_EQ(tip_amount, 10.0);
+}
+
+IN_PROC_BROWSER_TEST_F(
+    RewardsContributionBrowserTest,
+    PanelMonthlyTipActions) {
+  rewards_browsertest_util::EnableRewardsViaCode(browser(), rewards_service_);
+  contribution_->AddBalance(promotion_->ClaimPromotionViaCode());
+
+  rewards_browsertest_util::NavigateToPublisherPage(
+      browser(),
+      https_server_.get(),
+      "3zsistemi.si");
+
+  // Add a recurring tip of 10 BAT.
+  contribution_->TipViaCode(
+      "3zsistemi.si",
+      10.0,
+      ledger::type::PublisherStatus::VERIFIED,
+      0,
+      true);
+
+  // Verify "Change amount" opens monthly tip form
+  content::WebContents* banner = rewards_browsertest_helper::OpenSiteBanner(
+      browser(),
+      rewards_browsertest_util::TipAction::ChangeMonthly);
+
+  rewards_browsertest_util::WaitForElementToContain(
+      banner,
+      "[data-test-id=form-submit-button]",
+      "Set monthly contribution");
+
+  // Verify "Cancel" opens cancel confirmation form
+  banner = rewards_browsertest_helper::OpenSiteBanner(
+      browser(),
+      rewards_browsertest_util::TipAction::ClearMonthly);
+
+  rewards_browsertest_util::WaitForElementToContain(
+      banner,
+      "[data-test-id=form-submit-button]",
+      "Confirm Canceling Monthly");
 }
 
 }  // namespace rewards_browsertest

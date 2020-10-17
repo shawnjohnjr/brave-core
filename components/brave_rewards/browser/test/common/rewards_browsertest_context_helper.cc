@@ -105,9 +105,43 @@ void EnableRewards(Browser* browser, const bool use_new_tab) {
       "[data-test-id2='enableMain']");
 }
 
+void ClickTipAction(
+    content::WebContents* contents,
+    rewards_browsertest_util::TipAction tip_action) {
+  DCHECK(contents);
+
+  using rewards_browsertest_util::TipAction;
+  using rewards_browsertest_util::WaitForElementThenClick;
+
+  if (tip_action == TipAction::OneTime) {
+    WaitForElementThenClick(contents, "[type=tip]");
+    return;
+  }
+
+  if (tip_action == TipAction::SetMonthly) {
+    WaitForElementThenClick(contents, "[type=tip-monthly]");
+    return;
+  }
+
+  // Show the monthly tip actions menu
+  WaitForElementThenClick(contents, "[data-test-id=toggle-monthly-actions]");
+
+  if (tip_action == TipAction::ChangeMonthly) {
+    WaitForElementThenClick(contents, "[data-test-id=change-monthly-amount]");
+    return;
+  }
+
+  if (tip_action == TipAction::ClearMonthly) {
+    WaitForElementThenClick(contents, "[data-test-id=clear-monthly-amount]");
+    return;
+  }
+
+  NOTREACHED();
+}
+
 content::WebContents* OpenSiteBanner(
     Browser* browser,
-    rewards_browsertest_util::ContributionType banner_type) {
+    rewards_browsertest_util::TipAction tip_action) {
   content::WebContents* popup_contents =
       rewards_browsertest_helper::OpenRewardsPopup(browser);
 
@@ -116,15 +150,8 @@ content::WebContents* OpenSiteBanner(
       content::NOTIFICATION_LOAD_COMPLETED_MAIN_FRAME,
       content::NotificationService::AllSources());
 
-  const std::string button_selector =
-      banner_type == rewards_browsertest_util::ContributionType::MonthlyTip
-      ? "[type='tip-monthly']"
-      : "[type='tip']";
-
   // Click button to initiate sending a tip.
-  rewards_browsertest_util::WaitForElementThenClick(
-      popup_contents,
-      button_selector);
+  ClickTipAction(popup_contents, tip_action);
 
   // Wait for the site banner to load
   site_banner_observer.Wait();

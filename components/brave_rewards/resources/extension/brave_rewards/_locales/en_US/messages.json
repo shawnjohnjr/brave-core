@@ -622,5 +622,9 @@
   "walletPending":  {
     "message": "Pending",
     "description": "Status button that tells user that he is currently pending"
+  },
+  "changeAmount":  {
+    "message": "Change amount",
+    "description": "Button text for changing monthly contribution amount"
   }
 }

@@ -25,7 +25,7 @@ void EnableRewards(Browser* browser, const bool use_new_tab = false);
 
 content::WebContents* OpenSiteBanner(
     Browser* browser,
-    rewards_browsertest_util::ContributionType banner_type);
+    rewards_browsertest_util::TipAction tip_action);
 
 void VisitPublisher(
     Browser* browser,
