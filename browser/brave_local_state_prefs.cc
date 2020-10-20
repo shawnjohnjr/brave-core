@@ -67,6 +67,7 @@ void RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
 #endif  // BUILDFLAG(BRAVE_P3A_ENABLED)
 
   brave::RegisterP3AUtilsPrefs(registry);
+  BraveNewTabCountTracker::RegisterPrefs(registry);
 #if !defined(OS_ANDROID)
   BraveWindowTracker::RegisterPrefs(registry);
   BraveUptimeTracker::RegisterPrefs(registry);

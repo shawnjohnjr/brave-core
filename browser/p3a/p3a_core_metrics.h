@@ -9,6 +9,7 @@
 #include <list>
 
 #include "base/timer/timer.h"
+#include "brave/components/ntp_background_images/browser/view_counter_service.h"
 #include "brave/components/weekly_storage/weekly_storage.h"
 #include "chrome/browser/resource_coordinator/usage_clock.h"
 #include "chrome/browser/ui/browser_list_observer.h"
@@ -61,6 +62,29 @@ class BraveWindowTracker : public BrowserListObserver {
   base::RepeatingTimer timer_;
   PrefService* local_state_;
   DISALLOW_COPY_AND_ASSIGN(BraveWindowTracker);
+};
+
+class BraveNewTabCountTracker
+     : public ::ntp_background_images::ViewCounterService::Observer {
+ public:
+  explicit BraveNewTabCountTracker(PrefService* local_state);
+  ~BraveNewTabCountTracker() override;
+
+  static void CreateInstance(PrefService* local_state);
+
+  static void RegisterPrefs(PrefRegistrySimple* registry);
+
+  // ViewCounterService::Observer:
+  void OnBrandedWallpaperShown() override;
+  void OnNewTabOpened() override;
+
+ private:
+  void UpdateP3AValues() const;
+
+  WeeklyStorage new_tab_count_state_;
+  WeeklyStorage branded_new_tab_count_state_;
+
+  DISALLOW_COPY_AND_ASSIGN(BraveNewTabCountTracker);
 };
 
 }  // namespace brave

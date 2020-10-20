@@ -27,7 +27,10 @@
 
 namespace ntp_background_images {
 
-// static
+// BEGIN - static
+base::ObserverList<ViewCounterService::Observer>::Unchecked
+    ViewCounterService::observer_list_;
+
 void ViewCounterService::RegisterProfilePrefs(
     user_prefs::PrefRegistrySyncable* registry) {
   registry->RegisterBooleanPref(
@@ -41,6 +44,15 @@ void ViewCounterService::RegisterProfilePrefs(
   registry->RegisterBooleanPref(
       prefs::kNewTabPageShowBackgroundImage, true);
 }
+
+void ViewCounterService::AddObserver(Observer* observer) {
+  observer_list_.AddObserver(observer);
+}
+
+void ViewCounterService::RemoveObserver(Observer* observer) {
+  observer_list_.RemoveObserver(observer);
+}
+// END - static
 
 ViewCounterService::ViewCounterService(NTPBackgroundImagesService* service,
                                        brave_ads::AdsService* ads_service,
@@ -84,6 +96,9 @@ void ViewCounterService::BrandedWallpaperWillBeDisplayed(
 
   ads_service_->OnNewTabPageAdEvent(wallpaper_id, creative_instance_id,
       ads::mojom::BraveAdsNewTabPageAdEventType::kViewed);
+
+  for (auto& observer : observer_list_)
+      observer.OnBrandedWallpaperShown();
 }
 
 NTPBackgroundImagesData*
@@ -188,6 +203,9 @@ void ViewCounterService::ResetNotificationState() {
 }
 
 void ViewCounterService::RegisterPageView() {
+  for (auto& observer : observer_list_)
+    observer.OnNewTabOpened();
+
   // Don't do any counting if we will never be showing the data
   // since we want the count to start at the point of data being available
   // or the user opt-in status changing.

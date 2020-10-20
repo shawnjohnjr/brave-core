@@ -221,8 +221,10 @@ bool IsRegularProfile(content::BrowserContext* context) {
 }
 
 void RecordInitialP3AValues(Profile* profile) {
-  bool is_sponsored_image_enabled = profile->GetPrefs()->GetBoolean(
-      kNewTabPageShowSponsoredImagesBackgroundImage);
+  bool is_sponsored_image_enabled =
+      profile->GetPrefs()->GetBoolean(kNewTabPageShowBackgroundImage) &&
+      profile->GetPrefs()->GetBoolean(
+          kNewTabPageShowSponsoredImagesBackgroundImage);
   UMA_HISTOGRAM_BOOLEAN("Brave.NTP.SponsoredImagesEnabled",
                         is_sponsored_image_enabled);
 }

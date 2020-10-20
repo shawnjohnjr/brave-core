@@ -10,12 +10,13 @@
 #include <string>
 #include <vector>
 
+#include "base/observer_list.h"
 #include "base/values.h"
-#include "components/keyed_service/core/keyed_service.h"
-#include "components/prefs/pref_change_registrar.h"
 #include "brave/components/brave_ads/browser/ads_service.h"
 #include "brave/components/ntp_background_images/browser/ntp_background_images_service.h"
 #include "brave/components/ntp_background_images/browser/view_counter_model.h"
+#include "components/keyed_service/core/keyed_service.h"
+#include "components/prefs/pref_change_registrar.h"
 
 class PrefService;
 
@@ -35,6 +36,14 @@ struct TopSite;
 class ViewCounterService : public KeyedService,
                            public NTPBackgroundImagesService::Observer {
  public:
+  class Observer {
+   public:
+    virtual void OnBrandedWallpaperShown() = 0;
+    virtual void OnNewTabOpened() = 0;
+   protected:
+    virtual ~Observer() = default;
+  };
+
   ViewCounterService(NTPBackgroundImagesService* service,
                      brave_ads::AdsService* ads_service,
                      PrefService* prefs,
@@ -44,6 +53,8 @@ class ViewCounterService : public KeyedService,
   ViewCounterService(const ViewCounterService&) = delete;
   ViewCounterService& operator=(const ViewCounterService&) = delete;
 
+  static void AddObserver(Observer* observer);
+  static void RemoveObserver(Observer* observer);
   static void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry);
 
   // Lets the counter know that a New Tab Page view has occured.
@@ -122,6 +133,10 @@ class ViewCounterService : public KeyedService,
   bool is_supported_locale_ = false;
   PrefChangeRegistrar pref_change_registrar_;
   ViewCounterModel model_;
+
+  // A list of observers which will be notified when views increment.
+  // Used by P3A to check count for new tabs / new sponsored tabs.
+  static base::ObserverList<Observer>::Unchecked observer_list_;
 };
 
 }  // namespace ntp_background_images

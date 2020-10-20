@@ -21,10 +21,14 @@ namespace brave {
 namespace {
 
 BraveWindowTracker* g_brave_windows_tracker_instance = nullptr;
+BraveNewTabCountTracker* g_brave_ntp_count_tracker_instance = nullptr;
 
 constexpr char kLastTimeIncognitoUsed[] =
     "core_p3a_metrics.incognito_used_timestamp";
 constexpr char kTorUsed[] = "core_p3a_metrics.tor_used";
+constexpr char kNewTabsCreated[] = "brave.new_tab_page.p3a_new_tabs_created";
+constexpr char kSponsoredNewTabsCreated[] =
+    "brave.new_tab_page.p3a_sponsored_new_tabs_created";
 
 constexpr size_t kWindowUsageP3AIntervalMinutes = 10;
 
@@ -170,6 +174,80 @@ void BraveWindowTracker::UpdateP3AValues() const {
   // 0 -> Yes; 1 -> No.
   const int tor_used = !local_state_->GetBoolean(kTorUsed);
   UMA_HISTOGRAM_EXACT_LINEAR("Brave.Core.TorEverUsed", tor_used, 1);
+}
+
+void BraveNewTabCountTracker::CreateInstance(PrefService* local_state) {
+  g_brave_ntp_count_tracker_instance = new BraveNewTabCountTracker(local_state);
+}
+
+void BraveNewTabCountTracker::RegisterPrefs(PrefRegistrySimple* registry) {
+  registry->RegisterListPref(kNewTabsCreated);
+  registry->RegisterListPref(kSponsoredNewTabsCreated);
+}
+
+BraveNewTabCountTracker::BraveNewTabCountTracker(PrefService* local_state)
+    : new_tab_count_state_(local_state, kNewTabsCreated),
+      branded_new_tab_count_state_(local_state, kSponsoredNewTabsCreated) {
+  ::ntp_background_images::ViewCounterService::AddObserver(this);
+}
+
+BraveNewTabCountTracker::~BraveNewTabCountTracker() {
+  ::ntp_background_images::ViewCounterService::RemoveObserver(this);
+}
+
+// ViewCounterService::Observer:
+void BraveNewTabCountTracker::OnBrandedWallpaperShown() {
+  branded_new_tab_count_state_.AddDelta(1);
+  UpdateP3AValues();
+}
+
+// ViewCounterService::Observer:
+void BraveNewTabCountTracker::OnNewTabOpened() {
+  new_tab_count_state_.AddDelta(1);
+  UpdateP3AValues();
+}
+
+void BraveNewTabCountTracker::UpdateP3AValues() const {
+  int answer;
+  uint64_t new_tab_count = new_tab_count_state_.GetHighestValueInWeek();
+  if (new_tab_count == 0) {
+    answer = 0;
+  } else if (new_tab_count > 0 && new_tab_count < 4) {
+    answer = 1;
+  } else if (new_tab_count >= 4 && new_tab_count < 9) {
+    answer = 2;
+  } else if (new_tab_count >= 9 && new_tab_count < 21) {
+    answer = 3;
+  } else if (new_tab_count >= 21 && new_tab_count < 51) {
+    answer = 4;
+  } else if (new_tab_count >= 51 && new_tab_count < 101) {
+    answer = 5;
+  } else {
+    answer = 6;
+  }
+  UMA_HISTOGRAM_EXACT_LINEAR("Brave.NTP.NewTabsCreated", answer, 6);
+
+  uint64_t branded_new_tab_count =
+      branded_new_tab_count_state_.GetHighestValueInWeek();
+  if (branded_new_tab_count == 0 || new_tab_count == 0) {
+    answer = 0;
+  } else {
+    double ratio = (branded_new_tab_count / (double)new_tab_count) * 100;
+    if (ratio > 0 && ratio < 10.0) {
+      answer = 1;
+    } else if (ratio >= 10.0 && ratio < 20.0) {
+      answer = 2;
+    } else if (ratio >= 20.0 && ratio < 30.0) {
+      answer = 3;
+    } else if (ratio >= 30.0 && ratio < 40.0) {
+      answer = 4;
+    } else if (ratio >= 40.0 && ratio < 50.0) {
+      answer = 5;
+    } else if (ratio >= 50.0) {
+      answer = 6;
+    }
+  }
+  UMA_HISTOGRAM_EXACT_LINEAR("Brave.NTP.SponsoredNewTabsCreated", answer, 6);
 }
 
 }  // namespace brave

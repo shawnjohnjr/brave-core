@@ -81,6 +81,8 @@ void BraveBrowserMainExtraParts::PreMainMessageLoopRun() {
 
   RecordInitialP3AValues();
 
+  brave::BraveNewTabCountTracker::CreateInstance(
+      g_browser_process->local_state());
   // The code below is not supported on android.
 #if !defined(OS_ANDROID)
   brave::BraveWindowTracker::CreateInstance(g_browser_process->local_state());
