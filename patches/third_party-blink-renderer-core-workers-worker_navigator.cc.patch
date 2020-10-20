@@ -1,0 +1,12 @@
+diff --git a/third_party/blink/renderer/core/workers/worker_navigator.cc b/third_party/blink/renderer/core/workers/worker_navigator.cc
+index 2be0731c9f863f095f89f5d8f1888f4ee3c4cdff..5e60369a236757def5b6c5109983b7a9240fcdc9 100644
+--- a/third_party/blink/renderer/core/workers/worker_navigator.cc
++++ b/third_party/blink/renderer/core/workers/worker_navigator.cc
+@@ -47,6 +47,7 @@ WorkerNavigator::WorkerNavigator(const String& user_agent,
+ WorkerNavigator::~WorkerNavigator() = default;
+ 
+ String WorkerNavigator::userAgent() const {
++  BRAVE_WORKERNAVIGATOR_USERAGENT
+   return user_agent_;
+ }
+ 

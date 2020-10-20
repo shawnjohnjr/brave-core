@@ -168,6 +168,22 @@ IN_PROC_BROWSER_TEST_F(BraveNavigatorUserAgentFarblingBrowserTest,
   std::string remote_iframe_ua = ExecScriptGetStr(kTitleScript, contents());
   EXPECT_EQ(remote_iframe_ua, "pass");
 
+  // test that workers also inherit the farbled user agent
+  // (farbling level is still maximum)
+  NavigateToURLUntilLoadStop(embedded_test_server()->GetURL(
+      domain_b, "/navigator/workers-useragent.html"));
+  // NavigateToURLUntilLoadStop() will return before our Worker has a chance
+  // to run its code to completion, so we block here until document.title
+  // changes. This will happen relatively quickly if things are going well
+  // inside the Worker. If the browser crashes while executing the Worker
+  // code (which is what this test is really testing), then this will never
+  // unblock and the entire browser test will eventually time out. Timing
+  // out indicates a fatal error.
+  while (ExecScriptGetStr(kTitleScript, contents()) == "") {
+  }
+  std::string worker_ua_test = ExecScriptGetStr(kTitleScript, contents());
+  EXPECT_EQ(worker_ua_test, "pass");
+
   // Farbling level: off
   // verify that user agent is reset properly after having been farbled
   AllowFingerprinting(domain_b);

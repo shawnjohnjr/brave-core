@@ -6,18 +6,17 @@
 #include <random>
 
 #include "third_party/blink/public/platform/web_content_settings_client.h"
-#include "third_party/blink/renderer/core/frame/local_frame.h"
-#include "third_party/blink/renderer/core/loader/frame_loader.h"
+#include "third_party/blink/renderer/core/execution_context/execution_context.h"
 
-#define BRAVE_NAVIGATOR_USERAGENT                                      \
+#define BRAVE_WORKERNAVIGATOR_USERAGENT                                \
   if (blink::WebContentSettingsClient* settings =                      \
           brave::GetContentSettingsClientFor(GetExecutionContext())) { \
     if (!settings->AllowFingerprinting(true)) {                        \
       return brave::BraveSessionCache::From(*(GetExecutionContext()))  \
-          .FarbledUserAgent(GetFrame()->Loader().UserAgent());         \
+          .FarbledUserAgent(user_agent_);                              \
     }                                                                  \
   }
 
-#include "../../../../../../../third_party/blink/renderer/core/frame/navigator.cc"
+#include "../../../../../../../third_party/blink/renderer/core/workers/worker_navigator.cc"
 
-#undef BRAVE_NAVIGATOR_USERAGENT
+#undef BRAVE_WORKERNAVIGATOR_USERAGENT
