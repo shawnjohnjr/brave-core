@@ -10,6 +10,7 @@
 #include <string>
 
 #include "base/values.h"
+#include "bat/ads/ad_info.h"
 #include "bat/ads/ads.h"
 #include "bat/ads/internal/ad_conversions/ad_conversion_info.h"
 #include "bat/ads/internal/ad_conversions/ad_conversion_queue_item_info.h"
@@ -61,8 +62,7 @@ class AdConversions {
       const AdConversionList& ad_conversions);
 
   void AddItemToQueue(
-      const std::string& creative_instance_id,
-      const std::string& creative_set_id);
+      const AdInfo& ad);
   bool RemoveItemFromQueue(
       const std::string& creative_instance_id);
   void ProcessQueueItem(
