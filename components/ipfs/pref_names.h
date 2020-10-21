@@ -9,5 +9,6 @@
 extern const char kIPFSResolveMethod[];
 extern const char kIPFSBinaryAvailable[];
 extern const char kIPFSAutoFallbackToGateway[];
+extern const char kIPFSEnabled[];
 
 #endif  // BRAVE_COMPONENTS_IPFS_PREF_NAMES_H_

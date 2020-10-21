@@ -7,6 +7,7 @@
 #include "brave/browser/tor/buildflags.h"
 #include "brave/common/pref_names.h"
 #include "brave/common/tor/pref_names.h"
+#include "brave/components/ipfs/pref_names.h"
 #include "chrome/browser/policy/configuration_policy_handler_list_factory.h"
 #include "components/policy/core/browser/configuration_policy_handler.h"
 #include "components/policy/policy_constants.h"
@@ -15,13 +16,16 @@ namespace {
 
 // Wrap whole array definition in TOR to avoid unused varilable build error.
 // It can happen if platform doesn't support tor.
-#if BUILDFLAG(ENABLE_TOR)
 const policy::PolicyToPreferenceMapEntry kBraveSimplePolicyMap[] = {
+#if BUILDFLAG(ENABLE_TOR)
   { policy::key::kTorDisabled,
     tor::prefs::kTorDisabled,
     base::Value::Type::BOOLEAN },
-};
 #endif
+  { policy::key::kIPFSEnabled,
+    kIPFSEnabled,
+    base::Value::Type::BOOLEAN },
+};
 
 }  // namespace
 
@@ -38,14 +42,14 @@ std::unique_ptr<ConfigurationPolicyHandlerList> BuildHandlerList(
 
   // TODO(simonhong): Remove this guard when array size is not empty w/o tor.
   // base::size failed to instantiate with zero-size array.
-#if BUILDFLAG(ENABLE_TOR)
+// #if BUILDFLAG(ENABLE_TOR)
   for (size_t i = 0; i < base::size(kBraveSimplePolicyMap); ++i) {
     handlers->AddHandler(std::make_unique<SimplePolicyHandler>(
         kBraveSimplePolicyMap[i].policy_name,
         kBraveSimplePolicyMap[i].preference_path,
         kBraveSimplePolicyMap[i].value_type));
   }
-#endif
+// #endif
   return handlers;
 }
 

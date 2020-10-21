@@ -28,12 +28,8 @@
 namespace {
 
 bool IsIPFSDisabled(content::BrowserContext* browser_context) {
-  auto* prefs = user_prefs::UserPrefs::Get(browser_context);
-  auto resolve_method = static_cast<ipfs::IPFSResolveMethodTypes>(
-      prefs->GetInteger(kIPFSResolveMethod));
-  return resolve_method == ipfs::IPFSResolveMethodTypes::IPFS_DISABLED ||
-         !ipfs::IpfsService::IsIpfsEnabled(
-             browser_context, brave::IsRegularProfile(browser_context));
+  return !ipfs::IpfsService::IsIpfsEnabled(
+      browser_context, brave::IsRegularProfile(browser_context));
 }
 
 bool IsIPFSLocalGateway(content::BrowserContext* browser_context) {

@@ -50,6 +50,7 @@ extern const char kLinkedInEmbedControlType[];
 extern const char kWebTorrentEnabled[];
 extern const char kHangoutsEnabled[];
 extern const char kIPFSCompanionEnabled[];
+extern const char kIPFSDisabled[];
 extern const char kNewTabPageShowClock[];
 extern const char kNewTabPageClockFormat[];
 extern const char kNewTabPageShowTopSites[];

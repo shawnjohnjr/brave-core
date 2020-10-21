@@ -20,3 +20,5 @@ const char kIPFSBinaryAvailable[] = "brave.ipfs.binary_available";
 // Used to determine whether to automatically fallback to gateway when the
 // local node is not available.
 const char kIPFSAutoFallbackToGateway[] = "brave.ipfs.auto_fallback_to_gateway";
+
+const char kIPFSEnabled[] = "brave.ipfs.disabled";

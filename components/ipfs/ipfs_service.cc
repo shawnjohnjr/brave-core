@@ -112,8 +112,18 @@ IpfsService::~IpfsService() = default;
 // static
 bool IpfsService::IsIpfsEnabled(content::BrowserContext* context,
                                 bool regular_profile) {
+  PrefService* prefs = user_prefs::UserPrefs::Get(context);
+
+  LOG(ERROR) << "is ipfs pref managed" << prefs->IsManagedPreference(kIPFSEnabled);
+
+  bool disable = (prefs->FindPreference(kIPFSEnabled) &&
+                  !prefs->GetBoolean(kIPFSEnabled)) ||
+                 (prefs->FindPreference(kIPFSResolveMethod) &&
+                  prefs->GetInteger(kIPFSResolveMethod) ==
+                      static_cast<int>(IPFSResolveMethodTypes::IPFS_DISABLED));
+
   // IPFS is disabled for OTR profiles, Tor profiles, and guest sessions.
-  if (!regular_profile ||
+  if (!regular_profile || disable ||
       !base::FeatureList::IsEnabled(features::kIpfsFeature) ||
       base::CommandLine::ForCurrentProcess()->HasSwitch(
           ipfs::kDisableIpfsClientUpdaterExtension))
@@ -129,6 +139,11 @@ void IpfsService::RegisterPrefs(PrefRegistrySimple* registry) {
       static_cast<int>(ipfs::IPFSResolveMethodTypes::IPFS_ASK));
   registry->RegisterBooleanPref(kIPFSBinaryAvailable, false);
   registry->RegisterBooleanPref(kIPFSAutoFallbackToGateway, false);
+}
+
+// static
+void IpfsService::RegisterLocalStatePrefs(PrefRegistrySimple* registry) {
+  registry->RegisterBooleanPref(kIPFSEnabled, true);
 }
 
 base::FilePath IpfsService::GetIpfsExecutablePath() {
