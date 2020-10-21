@@ -137,7 +137,7 @@ TEST_F(BatAdsNewTabPageAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kNewTabPageAd, ad, ConfirmationType::kViewed);
+      AdType::kNewTabPageAd, ad, ConfirmationType::kViewed);
   for (int i = 0; i < 3; i++) {
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
   }
@@ -158,7 +158,7 @@ TEST_F(BatAdsNewTabPageAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kNewTabPageAd, ad, ConfirmationType::kViewed);
+      AdType::kNewTabPageAd, ad, ConfirmationType::kViewed);
   for (int i = 0; i < 4; i++) {
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
   }
@@ -181,7 +181,7 @@ TEST_F(BatAdsNewTabPageAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kNewTabPageAd, ad, ConfirmationType::kViewed);
+      AdType::kNewTabPageAd, ad, ConfirmationType::kViewed);
   for (int i = 0; i < 4; i++) {
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
   }

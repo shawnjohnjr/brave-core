@@ -139,7 +139,7 @@ TEST_F(BatAdsAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kAdNotification, ad, ConfirmationType::kViewed);
+      AdType::kAdNotification, ad, ConfirmationType::kViewed);
   get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
   // Act
@@ -158,7 +158,7 @@ TEST_F(BatAdsAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kAdNotification, ad, ConfirmationType::kViewed);
+      AdType::kAdNotification, ad, ConfirmationType::kViewed);
   get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
   // Act
@@ -177,7 +177,7 @@ TEST_F(BatAdsAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kAdNotification, ad, ConfirmationType::kViewed);
+      AdType::kAdNotification, ad, ConfirmationType::kViewed);
   get_client()->AppendAdHistoryToAdsHistory(ad_history);
   get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
@@ -199,7 +199,7 @@ TEST_F(BatAdsAdsPerHourFrequencyCapTest,
   ad.creative_instance_id = kCreativeInstanceId;
 
   const AdHistory ad_history = GenerateAdHistory(
-      AdContent::AdType::kAdNotification, ad, ConfirmationType::kViewed);
+      AdType::kAdNotification, ad, ConfirmationType::kViewed);
   get_client()->AppendAdHistoryToAdsHistory(ad_history);
   get_client()->AppendAdHistoryToAdsHistory(ad_history);
 

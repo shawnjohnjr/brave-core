@@ -149,7 +149,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -180,7 +180,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -211,7 +211,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -242,7 +242,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -273,7 +273,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -306,7 +306,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -339,7 +339,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad, confirmation_type);
+        AdType::kAdNotification, ad, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -374,7 +374,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad_2, confirmation_type);
+        AdType::kAdNotification, ad_2, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));
@@ -409,7 +409,7 @@ TEST_F(BatAdsDismissedFrequencyCapTest,
 
   for (const auto& confirmation_type : confirmation_types) {
     AdHistory ad_history = GenerateAdHistory(
-        AdContent::AdType::kAdNotification, ad_2, confirmation_type);
+        AdType::kAdNotification, ad_2, confirmation_type);
     get_client()->AppendAdHistoryToAdsHistory(ad_history);
 
     task_environment_.FastForwardBy(base::TimeDelta::FromMinutes(5));

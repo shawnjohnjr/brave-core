@@ -10,8 +10,9 @@
 #include "bat/ads/confirmation_type.h"
 #include "bat/ads/internal/ads_impl.h"
 #include "bat/ads/internal/confirmations/confirmations.h"
+#include "bat/ads/internal/database/tables/ad_events_database_table.h"
+#include "bat/ads/internal/frequency_capping/ad_exclusion_rules/viewed_new_tab_page_ad_frequency_cap.h"
 #include "bat/ads/internal/frequency_capping/frequency_capping_util.h"
-#include "bat/ads/internal/frequency_capping/ad_exclusion_rules/new_tab_page_ad_wallpaper_frequency_cap.h"
 #include "bat/ads/internal/frequency_capping/permission_rules/new_tab_page_ads_per_day_frequency_cap.h"
 #include "bat/ads/internal/frequency_capping/permission_rules/new_tab_page_ads_per_hour_frequency_cap.h"
 #include "bat/ads/internal/logging.h"
@@ -39,25 +40,47 @@ void NewTabPageAdEventViewed::Trigger(
     return;
   }
 
-  NewTabPageAdWallpaperFrequencyCap new_tab_page_wallpaper_frequency_cap(ads_);
-  if (new_tab_page_wallpaper_frequency_cap.ShouldExclude(ad)) {
-    if (!new_tab_page_wallpaper_frequency_cap.get_last_message().empty()) {
-      BLOG(2, new_tab_page_wallpaper_frequency_cap.get_last_message());
+  database::table::AdEvents ad_events_database_table(ads_);
+  ad_events_database_table.GetAll([=](
+      const Result result,
+      const AdEventList ad_events) {
+    if (result != Result::SUCCESS) {
+      BLOG(1, "New tab page ad: Failed to get ad events");
+      return;
     }
 
-    BLOG(1, "New tab page ad: Not allowed based on history");
-    return;
-  }
+    ViewedNewTabPageAdFrequencyCap frequency_cap(ads_);
+    if (frequency_cap.ShouldExclude(ad, ad_events)) {
+      if (!frequency_cap.get_last_message().empty()) {
+        BLOG(2, frequency_cap.get_last_message());
+      }
 
-  BLOG(3, "Viewed new tab page ad with uuid " << ad.uuid
-      << " and creative instance id " << ad.creative_instance_id);
+      BLOG(1, "New tab page ad: Not allowed based on history");
+      return;
+    }
 
-  ads_->get_client()->AppendUuidToNewTabPageAdHistory(ad.uuid);
+    BLOG(3, "Viewed new tab page ad with uuid " << ad.uuid
+        << " and creative instance id " << ad.creative_instance_id);
 
-  ads_->AppendNewTabPageAdToHistory(ad, kConfirmationType);
+    AdEventInfo ad_event;
+    ad_event.uuid = ad.uuid;
+    ad_event.creative_instance_id = ad.creative_instance_id;
+    ad_event.creative_set_id = ad.creative_set_id;
+    ad_event.campaign_id = ad.campaign_id;
+    ad_event.timestamp = static_cast<int64_t>(base::Time::Now().ToDoubleT());
+    ad_event.confirmation_type = kConfirmationType;
+    ad_event.ad_type = ad.type;
+    database::table::AdEvents ad_events_database_table(ads_);
+    ad_events_database_table.LogEvent(ad_event, [](
+        const Result result) {
+      if (result != Result::SUCCESS) {
+        BLOG(1, "Failed to log new tab page ad viewed event");
+      }
+    });
 
-  ads_->get_confirmations()->ConfirmAd(ad.creative_instance_id,
-      kConfirmationType);
+    ads_->get_confirmations()->ConfirmAd(ad.creative_instance_id,
+        kConfirmationType);
+  });
 }
 
 std::vector<std::unique_ptr<PermissionRule>>

@@ -37,7 +37,7 @@ bool ConfirmationInfo::operator!=(
 
 bool ConfirmationInfo::IsValid() const {
   if (id.empty() ||
-      type == ConfirmationType::kNone ||
+      type == ConfirmationType::kUndefined ||
       creative_instance_id.empty()) {
     return false;
   }

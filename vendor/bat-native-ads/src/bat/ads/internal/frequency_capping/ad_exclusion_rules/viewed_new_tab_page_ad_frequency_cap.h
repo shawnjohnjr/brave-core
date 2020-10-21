@@ -6,10 +6,6 @@
 #ifndef BAT_ADS_INTERNAL_FREQUENCY_CAPPING_AD_EXCLUSION_RULES_NEW_TAB_PAGE_AD_WALLPAPER_CAP_FREQUENCY_CAP_H_  // NOLINT
 #define BAT_ADS_INTERNAL_FREQUENCY_CAPPING_AD_EXCLUSION_RULES_NEW_TAB_PAGE_AD_WALLPAPER_CAP_FREQUENCY_CAP_H_  // NOLINT
 
-#include <stdint.h>
-
-#include <deque>
-#include <map>
 #include <string>
 
 #include "bat/ads/internal/frequency_capping/ad_exclusion_rules/ad_exclusion_rule.h"
@@ -18,20 +14,21 @@ namespace ads {
 
 class AdsImpl;
 
-class NewTabPageAdWallpaperFrequencyCap : public AdExclusionRule {
+class ViewedNewTabPageAdFrequencyCap : public AdExclusionRule {
  public:
-  NewTabPageAdWallpaperFrequencyCap(
+  ViewedNewTabPageAdFrequencyCap(
       const AdsImpl* const ads);
 
-  ~NewTabPageAdWallpaperFrequencyCap() override;
+  ~ViewedNewTabPageAdFrequencyCap() override;
 
-  NewTabPageAdWallpaperFrequencyCap(
-      const NewTabPageAdWallpaperFrequencyCap&) = delete;
-  NewTabPageAdWallpaperFrequencyCap& operator=(
-      const NewTabPageAdWallpaperFrequencyCap&) = delete;
+  ViewedNewTabPageAdFrequencyCap(
+      const ViewedNewTabPageAdFrequencyCap&) = delete;
+  ViewedNewTabPageAdFrequencyCap& operator=(
+      const ViewedNewTabPageAdFrequencyCap&) = delete;
 
   bool ShouldExclude(
-      const AdInfo& ad) override;
+      const AdInfo& ad,
+      const AdEventList& ad_events) override;
 
   std::string get_last_message() const override;
 
@@ -41,12 +38,12 @@ class NewTabPageAdWallpaperFrequencyCap : public AdExclusionRule {
   std::string last_message_;
 
   bool DoesRespectCap(
-      const std::deque<uint64_t>& history,
+      const AdEventList& ad_events,
       const AdInfo& ad);
 
-  std::deque<uint64_t> FilterHistory(
-      const std::map<std::string, std::deque<uint64_t>>& history,
-      const std::string& uuid);
+  AdEventList FilterAdEvents(
+      const AdEventList& ad_events,
+      const AdInfo& ad) const;
 };
 
 }  // namespace ads

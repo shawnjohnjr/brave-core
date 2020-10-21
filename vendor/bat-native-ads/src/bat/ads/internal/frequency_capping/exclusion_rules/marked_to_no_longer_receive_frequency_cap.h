@@ -28,7 +28,8 @@ class MarkedToNoLongerReceiveFrequencyCap : public ExclusionRule {
       const MarkedToNoLongerReceiveFrequencyCap&) = delete;
 
   bool ShouldExclude(
-      const CreativeAdInfo& ad) override;
+      const CreativeAdInfo& ad,
+      const AdEventList& ad_events) override;
 
   std::string get_last_message() const override;
 

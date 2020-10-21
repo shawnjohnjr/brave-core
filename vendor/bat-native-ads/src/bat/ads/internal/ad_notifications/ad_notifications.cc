@@ -11,6 +11,7 @@
 
 #include "base/json/json_reader.h"
 #include "base/json/json_writer.h"
+#include "bat/ads/ad_type.h"
 #include "bat/ads/internal/ads_impl.h"
 #include "bat/ads/internal/logging.h"
 
@@ -31,7 +32,6 @@ const char kNotificationCategoryKey[] = "category";
 const char kNotificationTitleKey[] = "advertiser";
 const char kNotificationBodyKey[] = "text";
 const char kNotificationTargetUrlKey[] = "url";
-const char kNotificationGeoTargetKey[] = "geo_target";
 
 AdNotifications::AdNotifications(
     AdsImpl* ads)
@@ -64,6 +64,8 @@ bool AdNotifications::Get(
   }
 
   *info = *iter;
+
+  info->type = AdType::kAdNotification;
 
   return true;
 }
@@ -214,10 +216,6 @@ bool AdNotifications::GetNotificationFromDictionary(
     return false;
   }
 
-  if (!GetGeoTargetFromDictionary(dictionary, &notification_info.geo_target)) {
-    return false;
-  }
-
   *info = notification_info;
 
   return true;
@@ -271,12 +269,6 @@ bool AdNotifications::GetTargetUrlFromDictionary(
     base::DictionaryValue* dictionary,
     std::string* value) const {
   return GetStringFromDictionary(kNotificationTargetUrlKey, dictionary, value);
-}
-
-bool AdNotifications::GetGeoTargetFromDictionary(
-    base::DictionaryValue* dictionary,
-    std::string* value) const {
-  return GetStringFromDictionary(kNotificationGeoTargetKey, dictionary, value);
 }
 
 bool AdNotifications::GetStringFromDictionary(
@@ -431,8 +423,6 @@ base::Value AdNotifications::GetAsList() {
         base::Value(ad_notification.body));
     dictionary.SetKey(kNotificationTargetUrlKey,
         base::Value(ad_notification.target_url));
-    dictionary.SetKey(kNotificationGeoTargetKey,
-        base::Value(ad_notification.geo_target));
 
     list.Append(std::move(dictionary));
   }

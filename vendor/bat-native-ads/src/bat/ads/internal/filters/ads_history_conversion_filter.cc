@@ -5,6 +5,8 @@
 
 #include "bat/ads/internal/filters/ads_history_conversion_filter.h"
 
+#include "bat/ads/internal/logging.h"
+
 namespace ads {
 
 AdsHistoryConversionFilter::AdsHistoryConversionFilter() = default;
@@ -33,13 +35,17 @@ bool AdsHistoryConversionFilter::ShouldFilterConfirmationType(
       return false;
     }
 
-    case ConfirmationType::kNone:
     case ConfirmationType::kDismissed:
     case ConfirmationType::kLanded:
     case ConfirmationType::kFlagged:
     case ConfirmationType::kUpvoted:
     case ConfirmationType::kDownvoted:
     case ConfirmationType::kConversion: {
+      return true;
+    }
+
+    case ConfirmationType::kUndefined: {
+      NOTREACHED();
       return true;
     }
   }

@@ -9,6 +9,7 @@
 #include <string>
 
 #include "bat/ads/ads_history.h"
+#include "bat/ads/internal/logging.h"
 
 namespace ads {
 
@@ -57,12 +58,16 @@ bool AdsHistoryConfirmationFilter::ShouldFilterAction(
       return false;
     }
 
-    case ConfirmationType::kNone:
     case ConfirmationType::kLanded:
     case ConfirmationType::kFlagged:
     case ConfirmationType::kUpvoted:
     case ConfirmationType::kDownvoted:
     case ConfirmationType::kConversion: {
+      return true;
+    }
+
+    case ConfirmationType::kUndefined: {
+      NOTREACHED();
       return true;
     }
   }

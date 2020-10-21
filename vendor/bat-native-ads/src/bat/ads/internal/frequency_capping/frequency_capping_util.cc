@@ -9,6 +9,17 @@
 
 namespace ads {
 
+std::deque<uint64_t> GetTimestampHistoryForAdEvents(
+    const AdEventList& ad_events) {
+  std::deque<uint64_t> history;
+
+  for (const auto& ad_event : ad_events) {
+    history.push_back(ad_event.timestamp);
+  }
+
+  return history;
+}
+
 bool DoesHistoryRespectCapForRollingTimeConstraint(
     const std::deque<uint64_t> history,
     const uint64_t time_constraint_in_seconds,

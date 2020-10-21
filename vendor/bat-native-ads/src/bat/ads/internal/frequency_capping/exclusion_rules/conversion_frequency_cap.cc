@@ -12,6 +12,10 @@
 
 namespace ads {
 
+namespace {
+const int kConversionFrequencyCap = 1;
+}  // namespace
+
 ConversionFrequencyCap::ConversionFrequencyCap(
     const AdsImpl* const ads)
     : ads_(ads) {
@@ -21,7 +25,8 @@ ConversionFrequencyCap::ConversionFrequencyCap(
 ConversionFrequencyCap::~ConversionFrequencyCap() = default;
 
 bool ConversionFrequencyCap::ShouldExclude(
-    const CreativeAdInfo& ad) {
+    const CreativeAdInfo& ad,
+    const AdEventList& ad_events) {
   if (!ShouldAllow(ad)) {
     last_message_ = base::StringPrintf("creativeSetId %s excluded due to ad "
         " conversion tracking being disabled", ad.creative_set_id.c_str());
@@ -29,13 +34,9 @@ bool ConversionFrequencyCap::ShouldExclude(
     return true;
   }
 
-  const std::map<std::string, std::deque<uint64_t>> history =
-      ads_->get_client()->GetAdConversionHistory();
+  const AdEventList filtered_ad_events = FilterAdEvents(ad_events, ad);
 
-  const std::deque<uint64_t> filtered_history =
-      FilterHistory(history, ad.creative_set_id);
-
-  if (!DoesRespectCap(filtered_history, ad)) {
+  if (!DoesRespectCap(filtered_ad_events, ad)) {
     last_message_ = base::StringPrintf("creativeSetId %s has exceeded the "
         "frequency capping for conversions", ad.creative_set_id.c_str());
 
@@ -59,25 +60,28 @@ bool ConversionFrequencyCap::ShouldAllow(
 }
 
 bool ConversionFrequencyCap::DoesRespectCap(
-      const std::deque<uint64_t>& history,
-      const CreativeAdInfo& ad) {
-  if (history.size() >= 1) {
+    const AdEventList& ad_events,
+    const CreativeAdInfo& ad) {
+  if (ad_events.size() >= kConversionFrequencyCap) {
     return false;
   }
 
   return true;
 }
 
-std::deque<uint64_t> ConversionFrequencyCap::FilterHistory(
-    const std::map<std::string, std::deque<uint64_t>>& history,
-    const std::string& creative_set_id) {
-  std::deque<uint64_t> filtered_history;
+AdEventList ConversionFrequencyCap::FilterAdEvents(
+    const AdEventList& ad_events,
+    const CreativeAdInfo& ad) const {
+  AdEventList filtered_ad_events = ad_events;
 
-  if (history.find(creative_set_id) != history.end()) {
-    filtered_history = history.at(creative_set_id);
-  }
+  const auto iter = std::remove_if(filtered_ad_events.begin(),
+      filtered_ad_events.end(), [&ad](const AdEventInfo& ad_event) {
+    return ad_event.creative_set_id != ad.creative_set_id ||
+        ad_event.confirmation_type != ConfirmationType::kConversion;
+  });
+  filtered_ad_events.erase(iter, filtered_ad_events.end());
 
-  return filtered_history;
+  return filtered_ad_events;
 }
 
 }  // namespace ads

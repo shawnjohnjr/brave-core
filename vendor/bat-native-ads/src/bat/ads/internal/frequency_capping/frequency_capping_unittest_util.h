@@ -18,7 +18,7 @@
 namespace ads {
 
 AdHistory GenerateAdHistory(
-    const AdContent::AdType type,
+    const AdType type,
     const CreativeAdInfo& ad,
     const ConfirmationType& confirmation_type);
 

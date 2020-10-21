@@ -134,7 +134,7 @@ AdContent::LikeAction Client::ToggleAdThumbUp(
     const AdContent::LikeAction action) {
   AdContent::LikeAction like_action;
   if (action == AdContent::LikeAction::kThumbsUp) {
-    like_action = AdContent::LikeAction::kNone;
+    like_action = AdContent::LikeAction::kNeutral;
   } else {
     like_action = AdContent::LikeAction::kThumbsUp;
   }
@@ -164,7 +164,7 @@ AdContent::LikeAction Client::ToggleAdThumbDown(
     const AdContent::LikeAction action) {
   AdContent::LikeAction like_action;
   if (action == AdContent::LikeAction::kThumbsDown) {
-    like_action = AdContent::LikeAction::kNone;
+    like_action = AdContent::LikeAction::kNeutral;
   } else {
     like_action = AdContent::LikeAction::kThumbsDown;
   }
@@ -172,7 +172,7 @@ AdContent::LikeAction Client::ToggleAdThumbDown(
   // Update this ad in the filtered ads list
   auto it_ad = FindFilteredAd(creative_instance_id,
       &client_state_->ad_prefs.filtered_ads);
-  if (like_action == AdContent::LikeAction::kNone) {
+  if (like_action == AdContent::LikeAction::kNeutral) {
     if (it_ad != client_state_->ad_prefs.filtered_ads.end()) {
       client_state_->ad_prefs.filtered_ads.erase(it_ad);
     }
@@ -441,115 +441,6 @@ void Client::AppendPageProbabilitiesToHistory(
 const classification::PageProbabilitiesList&
 Client::GetPageProbabilitiesHistory() {
   return client_state_->page_probabilities_history;
-}
-
-void Client::AppendCreativeSetIdToCreativeSetHistory(
-    const std::string& creative_set_id) {
-  if (client_state_->creative_set_history.find(creative_set_id) ==
-      client_state_->creative_set_history.end()) {
-    client_state_->creative_set_history.insert({creative_set_id, {}});
-  }
-
-  const uint64_t timestamp_in_seconds =
-      static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-
-  client_state_->creative_set_history.at(
-      creative_set_id).push_back(timestamp_in_seconds);
-
-  Save();
-}
-
-const std::map<std::string, std::deque<uint64_t>>&
-Client::GetCreativeSetHistory() const {
-  return client_state_->creative_set_history;
-}
-
-void Client::AppendCreativeSetIdToAdConversionHistory(
-    const std::string& creative_set_id) {
-  DCHECK(!creative_set_id.empty());
-  if (creative_set_id.empty()) {
-    return;
-  }
-
-  if (client_state_->ad_conversion_history.find(creative_set_id) ==
-      client_state_->ad_conversion_history.end()) {
-    client_state_->ad_conversion_history.insert({creative_set_id, {}});
-  }
-
-  const uint64_t timestamp_in_seconds =
-      static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-
-  client_state_->ad_conversion_history.at(
-      creative_set_id).push_back(timestamp_in_seconds);
-
-  Save();
-}
-
-const std::map<std::string, std::deque<uint64_t>>&
-Client::GetAdConversionHistory() const {
-  return client_state_->ad_conversion_history;
-}
-
-void Client::AppendCampaignIdToCampaignHistory(
-    const std::string& campaign_id) {
-  if (client_state_->campaign_history.find(campaign_id) ==
-      client_state_->campaign_history.end()) {
-    client_state_->campaign_history.insert({campaign_id, {}});
-  }
-
-  const uint64_t timestamp_in_seconds =
-      static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-
-  client_state_->campaign_history.at(
-      campaign_id).push_back(timestamp_in_seconds);
-
-  Save();
-}
-
-const std::map<std::string, std::deque<uint64_t>>&
-Client::GetCampaignHistory() const {
-  return client_state_->campaign_history;
-}
-
-void Client::AppendCampaignIdToLandedHistory(
-    const std::string& campaign_id) {
-  if (client_state_->landed_history.find(campaign_id) ==
-      client_state_->landed_history.end()) {
-    client_state_->landed_history.insert({campaign_id, {}});
-  }
-
-  const uint64_t timestamp_in_seconds =
-      static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-
-  client_state_->landed_history.at(campaign_id).push_back(timestamp_in_seconds);
-
-  Save();
-}
-
-const std::map<std::string, std::deque<uint64_t>>&
-Client::GetLandedHistory() const {
-  return client_state_->landed_history;
-}
-
-void Client::AppendUuidToNewTabPageAdHistory(
-    const std::string& uuid) {
-  if (client_state_->new_tab_page_ad_history.find(uuid) ==
-      client_state_->new_tab_page_ad_history.end()) {
-    client_state_->new_tab_page_ad_history.insert({uuid, {}});
-  }
-
-  const uint64_t timestamp_in_seconds =
-      static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-
-  client_state_->new_tab_page_ad_history.at(uuid).push_back(
-      timestamp_in_seconds);
-
-  Save();
-}
-
-const std::map<std::string, std::deque<uint64_t>>&
-Client::GetNewTabPageAdHistory() const {
-  return client_state_->new_tab_page_ad_history;
 }
 
 void Client::RemoveAllHistory() {

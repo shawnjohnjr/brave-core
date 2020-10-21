@@ -279,7 +279,6 @@ TEST_F(BatAdsAdConversionsTest,
 
   SaveAdConversions(ad_conversions);
 
-  TriggerAdEvent(info.creative_set_id, ConfirmationType::kNone);
   TriggerAdEvent(info.creative_set_id, ConfirmationType::kDismissed);
   TriggerAdEvent(info.creative_set_id, ConfirmationType::kLanded);
   TriggerAdEvent(info.creative_set_id, ConfirmationType::kFlagged);

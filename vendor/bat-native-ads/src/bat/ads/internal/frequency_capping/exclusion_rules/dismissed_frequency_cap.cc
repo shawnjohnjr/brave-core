@@ -23,13 +23,11 @@ DismissedFrequencyCap::DismissedFrequencyCap(
 DismissedFrequencyCap::~DismissedFrequencyCap() = default;
 
 bool DismissedFrequencyCap::ShouldExclude(
-    const CreativeAdInfo& ad) {
-  const std::deque<AdHistory> history = ads_->get_client()->GetAdsHistory();
+    const CreativeAdInfo& ad,
+    const AdEventList& ad_events) {
+  const AdEventList filtered_ad_events = FilterAdEvents(ad_events, ad);
 
-  const std::deque<AdHistory> filtered_history =
-      FilterHistory(history, ad.campaign_id);
-
-  if (!DoesRespectCap(filtered_history, ad)) {
+  if (!DoesRespectCap(filtered_ad_events, ad)) {
     last_message_ = base::StringPrintf("campaignId %s has exceeded the "
         "frequency capping for dismissed", ad.campaign_id.c_str());
     return true;
@@ -43,13 +41,14 @@ std::string DismissedFrequencyCap::get_last_message() const {
 }
 
 bool DismissedFrequencyCap::DoesRespectCap(
-    const std::deque<AdHistory>& history,
+    const AdEventList& ad_events,
     const CreativeAdInfo& ad) {
   int count = 0;
-  for (const auto& ad : history) {
-    if (ad.ad_content.ad_action == ConfirmationType::kClicked) {
+
+  for (const auto& ad_event : ad_events) {
+    if (ad_event.confirmation_type == ConfirmationType::kClicked) {
       count = 0;
-    } else if (ad.ad_content.ad_action == ConfirmationType::kDismissed) {
+    } else if (ad_event.confirmation_type == ConfirmationType::kDismissed) {
       count++;
     }
   }
@@ -63,33 +62,24 @@ bool DismissedFrequencyCap::DoesRespectCap(
   return true;
 }
 
-std::deque<AdHistory> DismissedFrequencyCap::FilterHistory(
-    const std::deque<AdHistory>& history,
-    const std::string& campaign_id) {
-  std::deque<AdHistory> filtered_history;
-
+AdEventList DismissedFrequencyCap::FilterAdEvents(
+    const AdEventList& ad_events,
+    const CreativeAdInfo& ad) const {
   const uint64_t time_constraint =
       2 * base::Time::kSecondsPerHour * base::Time::kHoursPerDay;
 
-  const uint64_t now_in_seconds = base::Time::Now().ToDoubleT();
+  const uint64_t now = base::Time::Now().ToDoubleT();
 
-  for (const auto& ad : history) {
-    if (ad.ad_content.type != AdContent::AdType::kAdNotification ||
-        ad.ad_content.campaign_id != campaign_id ||
-        now_in_seconds - ad.timestamp_in_seconds >= time_constraint) {
-      continue;
-    }
+  AdEventList filtered_ad_events = ad_events;
 
-    filtered_history.push_back(ad);
-  }
+  const auto iter = std::remove_if(filtered_ad_events.begin(),
+      filtered_ad_events.end(), [&](const AdEventInfo& ad_event) {
+    return ad_event.campaign_id != ad.campaign_id ||
+        now - ad_event.timestamp >= time_constraint;
+  });
+  filtered_ad_events.erase(iter, filtered_ad_events.end());
 
-  const auto sort = AdsHistorySortFactory::Build(
-      AdsHistory::SortType::kAscendingOrder);
-  DCHECK(sort);
-
-  filtered_history = sort->Apply(filtered_history);
-
-  return filtered_history;
+  return filtered_ad_events;
 }
 
 }  // namespace ads

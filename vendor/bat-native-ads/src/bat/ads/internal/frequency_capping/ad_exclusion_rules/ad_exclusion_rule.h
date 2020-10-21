@@ -9,6 +9,7 @@
 #include <string>
 
 #include "bat/ads/ad_info.h"
+#include "bat/ads/internal/ad_events/ad_event_info.h"
 
 namespace ads {
 
@@ -17,7 +18,8 @@ class AdExclusionRule {
   virtual ~AdExclusionRule() = default;
 
   virtual bool ShouldExclude(
-      const AdInfo& ad) = 0;
+      const AdInfo& ad,
+      const AdEventList& ad_events) = 0;
 
   virtual std::string get_last_message() const = 0;
 };

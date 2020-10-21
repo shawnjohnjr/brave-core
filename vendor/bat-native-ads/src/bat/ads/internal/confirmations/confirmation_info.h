@@ -35,7 +35,7 @@ struct ConfirmationInfo {
 
   std::string id;
   std::string creative_instance_id;
-  ConfirmationType type = ConfirmationType::kNone;
+  ConfirmationType type = ConfirmationType::kUndefined;
   privacy::UnblindedTokenInfo unblinded_token;
   Token payment_token;
   BlindedToken blinded_payment_token;

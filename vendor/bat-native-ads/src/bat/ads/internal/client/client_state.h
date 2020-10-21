@@ -38,11 +38,6 @@ struct ClientState {
   uint64_t next_check_serve_ad_timestamp_in_seconds = 0;
   bool available = false;
   classification::PageProbabilitiesList page_probabilities_history;
-  std::map<std::string, std::deque<uint64_t>> creative_set_history;
-  std::map<std::string, std::deque<uint64_t>> ad_conversion_history;
-  std::map<std::string, std::deque<uint64_t>> campaign_history;
-  std::map<std::string, std::deque<uint64_t>> landed_history;
-  std::map<std::string, std::deque<uint64_t>> new_tab_page_ad_history;
   double score = 0.0;
   std::string version_code;
   PurchaseIntentSignalSegmentHistoryMap purchase_intent_signal_history;

@@ -21,7 +21,8 @@ MarkedAsInappropriateFrequencyCap::
 ~MarkedAsInappropriateFrequencyCap() = default;
 
 bool MarkedAsInappropriateFrequencyCap::ShouldExclude(
-    const CreativeAdInfo& ad) {
+    const CreativeAdInfo& ad,
+    const AdEventList& ad_events) {
   if (!DoesRespectCap(ad)) {
     last_message_ = base::StringPrintf("creativeSetId %s excluded due to being "
         "marked as inappropriate", ad.creative_set_id.c_str());

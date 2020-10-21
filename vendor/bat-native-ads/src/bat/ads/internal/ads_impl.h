@@ -15,7 +15,7 @@
 
 #include "bat/ads/ad_info.h"
 #include "bat/ads/ads.h"
-#include "bat/ads/new_tab_page_ad_info.h"
+#include "bat/ads/internal/ad_events/ad_event_info.h"
 #include "bat/ads/internal/bundle/creative_ad_notification_info.h"
 #include "bat/ads/internal/bundle/creative_new_tab_page_ad_info.h"
 #include "bat/ads/internal/classification/page_classifier/page_classifier.h"
@@ -30,6 +30,7 @@
 #include "bat/ads/internal/timer.h"
 #include "bat/ads/internal/user_activity/user_activity.h"
 #include "bat/ads/internal/wallet/wallet_info.h"
+#include "bat/ads/new_tab_page_ad_info.h"
 #include "bat/ads/mojom.h"
 
 namespace ads {
@@ -270,17 +271,20 @@ class AdsImpl
   void ServeAdNotificationFromCategories(
       const classification::CategoryList& categories);
   void OnServeAdNotificationFromCategories(
+      const AdEventList& ad_events,
       const Result result,
       const classification::CategoryList& categories,
       const CreativeAdNotificationList& ads);
   void ServeAdNotificationFromParentCategories(
       const classification::CategoryList& categories);
   void OnServeAdNotificationFromParentCategories(
+      const AdEventList& ad_events,
       const Result result,
       const classification::CategoryList& categories,
       const CreativeAdNotificationList& ads);
   void ServeUntargetedAdNotification();
   void OnServeUntargetedAdNotification(
+      const AdEventList& ad_events,
       const Result result,
       const classification::CategoryList& categories,
       const CreativeAdNotificationList& ads);
@@ -292,7 +296,8 @@ class AdsImpl
       const std::string& reason);
 
   CreativeAdNotificationList GetEligibleAds(
-      const CreativeAdNotificationList& ads);
+      const CreativeAdNotificationList& ads,
+      const AdEventList& ad_events);
   CreativeAdNotificationList GetUnseenAdsAndRoundRobinIfNeeded(
       const CreativeAdNotificationList& ads) const;
   CreativeAdNotificationList GetUnseenAds(

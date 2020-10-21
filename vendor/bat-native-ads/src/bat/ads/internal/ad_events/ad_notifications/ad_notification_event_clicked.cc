@@ -9,6 +9,7 @@
 #include "bat/ads/internal/ad_notifications/ad_notifications.h"
 #include "bat/ads/internal/ads_impl.h"
 #include "bat/ads/internal/confirmations/confirmations.h"
+#include "bat/ads/internal/database/tables/ad_events_database_table.h"
 #include "bat/ads/internal/logging.h"
 
 namespace ads {
@@ -33,6 +34,22 @@ void AdNotificationEventClicked::Trigger(
   ads_->get_ad_notifications()->Remove(ad.uuid, /* should dismiss */ true);
 
   ads_->set_last_clicked_ad(ad);
+
+  AdEventInfo ad_event;
+  ad_event.uuid = ad.uuid;
+  ad_event.creative_instance_id = ad.creative_instance_id;
+  ad_event.creative_set_id = ad.creative_set_id;
+  ad_event.campaign_id = ad.campaign_id;
+  ad_event.timestamp = static_cast<int64_t>(base::Time::Now().ToDoubleT());
+  ad_event.confirmation_type = kConfirmationType;
+  ad_event.ad_type = ad.type;
+  database::table::AdEvents ad_events_database_table(ads_);
+  ad_events_database_table.LogEvent(ad_event, [](
+      const Result result) {
+    if (result != Result::SUCCESS) {
+      BLOG(1, "Failed to log ad conversion event");
+    }
+  });
 
   ads_->AppendAdNotificationToHistory(ad, kConfirmationType);
 

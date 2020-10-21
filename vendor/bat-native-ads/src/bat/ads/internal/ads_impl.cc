@@ -26,6 +26,7 @@
 #include "bat/ads/internal/classification/page_classifier/page_classifier_user_models.h"
 #include "bat/ads/internal/classification/purchase_intent_classifier/purchase_intent_classifier_user_models.h"
 #include "bat/ads/internal/confirmations/confirmations.h"
+#include "bat/ads/internal/database/tables/ad_events_database_table.h"
 #include "bat/ads/internal/database/tables/creative_ad_notifications_database_table.h"
 #include "bat/ads/internal/database/tables/creative_new_tab_page_ads_database_table.h"
 #include "bat/ads/internal/eligible_ads/eligible_ads_filter_factory.h"
@@ -440,6 +441,7 @@ void AdsImpl::OnGetCreativeNewTabPageAd(
   }
 
   NewTabPageAdInfo new_tab_page_ad;
+  new_tab_page_ad.type = AdType::kNewTabPageAd;
   new_tab_page_ad.uuid = wallpaper_id;
   new_tab_page_ad.creative_instance_id =
       creative_new_tab_page_ad.creative_instance_id;
@@ -447,7 +449,6 @@ void AdsImpl::OnGetCreativeNewTabPageAd(
   new_tab_page_ad.campaign_id = creative_new_tab_page_ad.campaign_id;
   new_tab_page_ad.category = creative_new_tab_page_ad.category;
   new_tab_page_ad.target_url = creative_new_tab_page_ad.target_url;
-  new_tab_page_ad.geo_target = creative_new_tab_page_ad.geo_targets.front();
   new_tab_page_ad.company_name = creative_new_tab_page_ad.company_name;
   new_tab_page_ad.alt = creative_new_tab_page_ad.alt;
 
@@ -797,18 +798,31 @@ void AdsImpl::ServeAdNotificationFromCategories(
     BLOG(1, "  " << category);
   }
 
-  const auto callback = std::bind(&AdsImpl::OnServeAdNotificationFromCategories,
-      this, _1, _2, _3);
+  database::table::AdEvents database_table(this);
+  database_table.GetAll([=](
+      const Result result,
+      const AdEventList ad_events) {
+    if (result != Result::SUCCESS) {
+      FailedToServeAdNotification("Failed to get ad events");
+      return;
+    }
 
-  database::table::CreativeAdNotifications database_table(this);
-  database_table.GetForCategories(categories, callback);
+    const auto callback =
+        std::bind(&AdsImpl::OnServeAdNotificationFromCategories,
+            this, ad_events, _1, _2, _3);
+
+    database::table::CreativeAdNotifications database_table(this);
+    database_table.GetForCategories(categories, callback);
+  });
 }
 
 void AdsImpl::OnServeAdNotificationFromCategories(
+    const AdEventList& ad_events,
     const Result result,
     const classification::CategoryList& categories,
     const CreativeAdNotificationList& ads) {
-  const CreativeAdNotificationList eligible_ads = GetEligibleAds(ads);
+  const CreativeAdNotificationList eligible_ads =
+      GetEligibleAds(ads, ad_events);
   if (eligible_ads.empty()) {
     BLOG(1, "No eligible ads found in categories:");
     for (const auto& category : categories) {
@@ -833,18 +847,31 @@ void AdsImpl::ServeAdNotificationFromParentCategories(
     BLOG(1, "  " << parent_category);
   }
 
-  const auto callback = std::bind(
-      &AdsImpl::OnServeAdNotificationFromParentCategories, this, _1, _2, _3);
+  database::table::AdEvents database_table(this);
+  database_table.GetAll([=](
+      const Result result,
+      const AdEventList ad_events) {
+    if (result != Result::SUCCESS) {
+      FailedToServeAdNotification("Failed to get ad events");
+      return;
+    }
 
-  database::table::CreativeAdNotifications database_table(this);
-  database_table.GetForCategories(parent_categories, callback);
+    const auto callback =
+        std::bind(&AdsImpl::OnServeAdNotificationFromParentCategories,
+            this, ad_events, _1, _2, _3);
+
+    database::table::CreativeAdNotifications database_table(this);
+    database_table.GetForCategories(parent_categories, callback);
+  });
 }
 
 void AdsImpl::OnServeAdNotificationFromParentCategories(
+    const AdEventList& ad_events,
     const Result result,
     const classification::CategoryList& categories,
     const CreativeAdNotificationList& ads) {
-  const CreativeAdNotificationList eligible_ads = GetEligibleAds(ads);
+  const CreativeAdNotificationList eligible_ads =
+      GetEligibleAds(ads, ad_events);
   if (eligible_ads.empty()) {
     BLOG(1, "No eligible ads found in parent categories:");
     for (const auto& category : categories) {
@@ -862,22 +889,34 @@ void AdsImpl::OnServeAdNotificationFromParentCategories(
 void AdsImpl::ServeUntargetedAdNotification() {
   BLOG(1, "Serving ad notification from untargeted category");
 
-  const std::vector<std::string> categories = {
-    classification::kUntargeted
-  };
+  database::table::AdEvents database_table(this);
+  database_table.GetAll([=](
+      const Result result,
+      const AdEventList ad_events) {
+    if (result != Result::SUCCESS) {
+      FailedToServeAdNotification("Failed to get ad events");
+      return;
+    }
 
-  const auto callback = std::bind(&AdsImpl::OnServeUntargetedAdNotification,
-      this, _1, _2, _3);
+    const std::vector<std::string> categories = {
+      classification::kUntargeted
+    };
 
-  database::table::CreativeAdNotifications database_table(this);
-  database_table.GetForCategories(categories, callback);
+    const auto callback = std::bind(&AdsImpl::OnServeUntargetedAdNotification,
+        this, ad_events, _1, _2, _3);
+
+    database::table::CreativeAdNotifications database_table(this);
+    database_table.GetForCategories(categories, callback);
+  });
 }
 
 void AdsImpl::OnServeUntargetedAdNotification(
+    const AdEventList& ad_events,
     const Result result,
     const classification::CategoryList& categories,
     const CreativeAdNotificationList& ads) {
-  const CreativeAdNotificationList eligible_ads = GetEligibleAds(ads);
+  const CreativeAdNotificationList eligible_ads =
+      GetEligibleAds(ads, ad_events);
   if (eligible_ads.empty()) {
     FailedToServeAdNotification("No eligible ads found");
     return;
@@ -984,7 +1023,8 @@ AdsImpl::CreateAdNotificationExclusionRules() const {
 }
 
 CreativeAdNotificationList AdsImpl::GetEligibleAds(
-    const CreativeAdNotificationList& ads) {
+    const CreativeAdNotificationList& ads,
+    const AdEventList& ad_events) {
   CreativeAdNotificationList eligible_ads;
 
   const auto exclusion_rules = CreateAdNotificationExclusionRules();
@@ -994,7 +1034,7 @@ CreativeAdNotificationList AdsImpl::GetEligibleAds(
     bool should_exclude = false;
 
     for (const auto& exclusion_rule : exclusion_rules) {
-      if (!exclusion_rule->ShouldExclude(ad)) {
+      if (!exclusion_rule->ShouldExclude(ad, ad_events)) {
         continue;
       }
 
@@ -1130,15 +1170,13 @@ bool AdsImpl::ShowAdNotification(
     return false;
   }
 
-  client_->AppendCreativeSetIdToCreativeSetHistory(info.creative_set_id);
-  client_->AppendCampaignIdToCampaignHistory(info.campaign_id);
-
   client_->UpdateSeenAdNotification(info.creative_instance_id, 1);
   client_->UpdateSeenAdvertiser(info.advertiser_id, 1);
 
   last_shown_creative_ad_notification_ = info;
 
   auto ad_notification = std::make_unique<AdNotificationInfo>();
+  ad_notification->type = AdType::kAdNotification;
   ad_notification->uuid = base::GenerateGUID();
   ad_notification->creative_instance_id = info.creative_instance_id;
   ad_notification->creative_set_id = info.creative_set_id;
@@ -1147,7 +1185,6 @@ bool AdsImpl::ShowAdNotification(
   ad_notification->title = info.title;
   ad_notification->body = info.body;
   ad_notification->target_url = info.target_url;
-  ad_notification->geo_target = info.geo_targets.at(0);
 
   BLOG(1, "Ad notification shown:\n"
       << "  uuid: " << ad_notification->uuid << "\n"
@@ -1403,7 +1440,21 @@ void AdsImpl::SustainAdInteractionIfNeeded(
 
   BLOG(1, "Sustained ad for " << url);
 
-  client_->AppendCampaignIdToLandedHistory(last_clicked_ad_.campaign_id);
+  AdEventInfo ad_event;
+  ad_event.uuid = last_clicked_ad_.uuid;
+  ad_event.creative_instance_id = last_clicked_ad_.creative_instance_id;
+  ad_event.creative_set_id = last_clicked_ad_.creative_set_id;
+  ad_event.campaign_id = last_clicked_ad_.campaign_id;
+  ad_event.timestamp = static_cast<int64_t>(base::Time::Now().ToDoubleT());
+  ad_event.confirmation_type = ConfirmationType::kLanded;
+  ad_event.ad_type = AdType::kNewTabPageAd;
+  database::table::AdEvents ad_events_database_table(this);
+  ad_events_database_table.LogEvent(ad_event, [](
+      const Result result) {
+    if (result != Result::SUCCESS) {
+      BLOG(1, "Failed to log sustained ad interaction event");
+    }
+  });
 
   confirmations_->ConfirmAd(last_clicked_ad_.creative_instance_id,
       ConfirmationType::kLanded);
@@ -1415,7 +1466,7 @@ void AdsImpl::AppendAdNotificationToHistory(
   AdHistory ad_history;
   ad_history.timestamp_in_seconds =
       static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-  ad_history.ad_content.type = AdContent::AdType::kAdNotification;
+  ad_history.ad_content.type = info.type;
   ad_history.ad_content.uuid = info.uuid;
   ad_history.ad_content.creative_instance_id = info.creative_instance_id;
   ad_history.ad_content.creative_set_id = info.creative_set_id;
@@ -1436,7 +1487,7 @@ void AdsImpl::AppendNewTabPageAdToHistory(
   AdHistory ad_history;
   ad_history.timestamp_in_seconds =
       static_cast<uint64_t>(base::Time::Now().ToDoubleT());
-  ad_history.ad_content.type = AdContent::AdType::kNewTabPageAd;
+  ad_history.ad_content.type = info.type;
   ad_history.ad_content.uuid = info.uuid;
   ad_history.ad_content.creative_instance_id = info.creative_instance_id;
   ad_history.ad_content.creative_set_id = info.creative_set_id;

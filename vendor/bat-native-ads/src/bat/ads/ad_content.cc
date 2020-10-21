@@ -56,8 +56,8 @@ Result AdContent::FromJson(
     return FAILED;
   }
 
-  if (document.HasMember("type")) {
-    type = static_cast<AdType>(document["type"].GetInt());
+  if (document.HasMember("type") && document["type"].IsString()) {
+    type = AdType(document["type"].GetString());
   } else {
     type = AdType::kAdNotification;
   }
@@ -122,7 +122,8 @@ void SaveToJson(JsonWriter* writer, const AdContent& content) {
   writer->StartObject();
 
   writer->String("type");
-  writer->Int(static_cast<int>(content.type));
+  auto type = std::string(content.type);
+  writer->String(type.c_str());
 
   writer->String("uuid");
   writer->String(content.uuid.c_str());

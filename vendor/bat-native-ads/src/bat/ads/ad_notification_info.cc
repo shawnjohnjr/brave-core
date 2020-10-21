@@ -35,6 +35,10 @@ Result AdNotificationInfo::FromJson(
     return FAILED;
   }
 
+  if (document.HasMember("type")) {
+    type = AdType(document["type"].GetString());
+  }
+
   if (document.HasMember("uuid")) {
     uuid = document["uuid"].GetString();
   }
@@ -67,10 +71,6 @@ Result AdNotificationInfo::FromJson(
     target_url = document["target_url"].GetString();
   }
 
-  if (document.HasMember("geo_target")) {
-    geo_target = document["geo_target"].GetString();
-  }
-
   return SUCCESS;
 }
 
@@ -78,6 +78,10 @@ void SaveToJson(
     JsonWriter* writer,
     const AdNotificationInfo& info) {
   writer->StartObject();
+
+  writer->String("type");
+  const std::string type = std::string(info.type);
+  writer->String(type.c_str());
 
   writer->String("uuid");
   writer->String(info.uuid.c_str());
@@ -102,9 +106,6 @@ void SaveToJson(
 
   writer->String("target_url");
   writer->String(info.target_url.c_str());
-
-  writer->String("geo_target");
-  writer->String(info.geo_target.c_str());
 
   writer->EndObject();
 }

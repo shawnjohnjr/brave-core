@@ -23,7 +23,8 @@ MarkedToNoLongerReceiveFrequencyCap::
 ~MarkedToNoLongerReceiveFrequencyCap() = default;
 
 bool MarkedToNoLongerReceiveFrequencyCap::ShouldExclude(
-    const CreativeAdInfo& ad) {
+    const CreativeAdInfo& ad,
+    const AdEventList& ad_events) {
   if (!DoesRespectCap(ad)) {
     last_message_ = base::StringPrintf("creativeSetId %s excluded due to being "
         "marked to no longer receive ads", ad.creative_set_id.c_str());

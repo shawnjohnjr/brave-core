@@ -48,8 +48,8 @@ bool AdsPerHourFrequencyCap::DoesRespectCap(
 
   const uint64_t cap = ads_->GetAdsPerHourPref();
 
-  return DoesHistoryRespectCapForRollingTimeConstraint(history,
-      time_constraint, cap);
+  return DoesHistoryRespectCapForRollingTimeConstraint(
+      history, time_constraint, cap);
 }
 
 std::deque<uint64_t> AdsPerHourFrequencyCap::FilterHistory(
@@ -57,7 +57,7 @@ std::deque<uint64_t> AdsPerHourFrequencyCap::FilterHistory(
   std::deque<uint64_t> filtered_history;
 
   for (const auto& ad : history) {
-    if (ad.ad_content.type != AdContent::AdType::kAdNotification ||
+    if (ad.ad_content.type != AdType::kAdNotification ||
         ad.ad_content.ad_action != ConfirmationType::kViewed) {
       continue;
     }
