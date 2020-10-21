@@ -1,8 +1,8 @@
 diff --git a/rlz/BUILD.gn b/rlz/BUILD.gn
-index 37247ec1e5683d6124335bb1f6405618169283a4..371f42d8ce0fc86f7946615b5119fcce84071565 100644
+index a0d731800c8536c612cbf4bcef8937a2fe86f08f..32a22dabbb9f905203efcc12f9b59985d7b1d5cf 100644
 --- a/rlz/BUILD.gn
 +++ b/rlz/BUILD.gn
-@@ -208,6 +208,7 @@ if (enable_rlz_support) {
+@@ -202,6 +202,7 @@ if (enable_rlz_support) {
      }
    }
  }

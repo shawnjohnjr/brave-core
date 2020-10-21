@@ -1,8 +1,8 @@
 diff --git a/build/config/compiler/BUILD.gn b/build/config/compiler/BUILD.gn
-index 4f6461b6b5f5b42669e03e4334a297011caa2e98..d1bd50b0e40ddea005c55f14a1962252fce5bf25 100644
+index b23c95de2ee23b952ca89deaabe157e6a965eeba..3fc767cd94b47f165a8737cce58f430d33e96802 100644
 --- a/build/config/compiler/BUILD.gn
 +++ b/build/config/compiler/BUILD.gn
-@@ -730,6 +730,7 @@ config("compiler") {
+@@ -753,6 +753,7 @@ config("compiler") {
      asmflags += cflags
      asmflags += cflags_c
    }
@@ -10,7 +10,7 @@ index 4f6461b6b5f5b42669e03e4334a297011caa2e98..d1bd50b0e40ddea005c55f14a1962252
  }
  
  # This provides the basic options to select the target CPU and ABI.
-@@ -1646,6 +1647,7 @@ config("chromium_code") {
+@@ -1669,6 +1670,7 @@ config("chromium_code") {
        cflags += [ "-Wextra-semi" ]
      }
    }
