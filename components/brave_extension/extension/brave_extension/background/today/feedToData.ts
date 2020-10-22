@@ -40,8 +40,9 @@ export default async function getBraveTodayData (
   const deals: (BraveToday.Deal)[] = []
   let articles: (BraveToday.Article)[] = []
 
-  // Filter to only enabled sources
-  feedContent = feedContent.filter(f => !!enabledPublishers[f.publisher_id])
+  // Filter to only enabled sources and images
+  feedContent = feedContent
+    .filter(f => isItemWithImage(f) && !!enabledPublishers[f.publisher_id])
   feedContent = await weightArticles(feedContent)
 
   for (let feedItem of feedContent) {
@@ -95,25 +96,20 @@ export default async function getBraveTodayData (
   const dealsCategoriesByPriority = Array.from(dealsCategoryCounts.keys())
     .sort((a, b) => dealsCategoryCounts[a] - dealsCategoryCounts[b])
 
-  // .sponsor,
-  // .headline(paired: false),
-  // .deals,
-
+  // TODO(petemill): Sponsor
   // const firstSponsors = sponsors.splice(0, 1) // Featured sponsor is the first sponsor
 
-  const firstHeadlines = take(articles, isArticleTopNews, 1)
+  const firstHeadlines = take(articles, 1, isArticleTopNews)
   const firstDeals = deals.splice(0, 3)
 
-  // generate as many pages of content as possible
+  // Generate as many pages of content as possible.
   const pages: BraveToday.Page[] = []
   let canGenerateAnotherPage = true
   // Sanity check: arbitrary max pages so we don't end up
   // in infinit loop.
   const maxPages = 4000;
   let curPage = 0;
-  while (canGenerateAnotherPage) {
-    curPage++
-    if (curPage > maxPages) break
+  while (canGenerateAnotherPage && curPage++ < maxPages) {
     const category = categoriesByPriority.shift()
     const dealsCategory = dealsCategoriesByPriority.shift()
     const nextPage = generateNextPage(articles, deals, category, dealsCategory)
@@ -132,8 +128,8 @@ export default async function getBraveTodayData (
   }
 }
 
-function isArticleWithImage (article: BraveToday.Article) {
-  return !!article.padded_img
+function isItemWithImage (item: BraveToday.FeedItem) {
+  return !!item.padded_img
 }
 
 function isArticleTopNews (article: BraveToday.Article) {
@@ -166,7 +162,7 @@ function generateNextPage (
   //    .headline(paired: false),
 
   // Collect headlines
-  const headlines = take(articles, isArticleWithImage, 13)
+  const headlines = take(articles, 13)
   if (!headlines.length) {
     return null
   }
@@ -174,21 +170,21 @@ function generateNextPage (
   const articlesWithCategory = featuredCategory
     ? take(
         articles,
+        3,
         a => a.category === featuredCategory,
-        3
       )
     : []
 
   let deals = !dealsCategory
     ? []
-    : take(allDeals, d => d.offers_category === dealsCategory, 3)
+    : take(allDeals, 3, d => d.offers_category === dealsCategory)
   if (deals.length < 3) {
     deals.concat(allDeals.splice(0, 3 - deals.length))
   }
 
   const publisherInfo = generateArticleSourceGroup(articles)
 
-  const randomArticles = take(articles, isArticleWithin48Hours, 4)
+  const randomArticles = take(articles, 4, isArticleWithin48Hours)
 
   return {
     articles: headlines,
@@ -206,18 +202,18 @@ function generateArticleSourceGroup (articles: BraveToday.Article[]): [string, B
       firstArticleWithSource.publisher_id,
       take(
         articles,
+        3,
         a => a.publisher_id === firstArticleWithSource.publisher_id,
-        3
       )
     ]
   }
   return undefined
 }
 
-function take<T>(items: T[], matching: (item: T) => boolean, count?: number, random: boolean = false): T[] {
+function take<T>(items: T[], count: number, matching?: (item: T) => boolean, random: boolean = false): T[] {
   let indicesToTake: number[] = []
   for (const [i, item] of items.entries())  {
-    const shouldTake = matching(item)
+    const shouldTake = matching ? matching(item) : true
     if (!shouldTake) {
       continue
     }
@@ -250,7 +246,11 @@ function domainFromUrlString(urlString: string): string {
 
 async function weightArticles(articles: BraveToday.FeedItem[]): Promise<BraveToday.FeedItem[]> {
   // hosts from latest max-200 history items
-  const historyItems: chrome.history.HistoryItem[] = await new Promise(resolve => chrome.history.search({ text: '', maxResults: 200 }, resolve))
+  const historyItems: chrome.history.HistoryItem[] = chrome.history
+    ? await new Promise(
+        resolve => chrome.history.search({ text: '', maxResults: 200 }, resolve)
+      )
+    : []
   const historyHosts: string[] = historyItems.map(h => h.url).filter(i => i).map((u: string) => domainFromUrlString(u))
   for (const article of articles) {
     let score = article.score
