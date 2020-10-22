@@ -19,8 +19,27 @@ import * as binanceActions from '../actions/binance_actions'
 import * as geminiActions from '../actions/gemini_actions'
 import * as bitcoinDotComActions from '../actions/bitcoin_dot_com_actions'
 import * as cryptoDotComActions from '../actions/cryptoDotCom_actions'
+import * as todayActions from '../actions/today_actions'
 import store from '../store'
 import { getNewTabData, getGridSitesData } from './default/data/storybookState'
+import todayState from './default/data/todayStorybookState'
+// TODO(petemill): privateCDN should be in /common/
+import { getUnpaddedAsDataUrl } from '../../brave_extension/extension/brave_extension/background/today/privateCDN'
+
+// TODO(petemill): Have the private CDN contain a CORS response so we can directly fetch
+// from JS.
+const proxyUrl = 'https://cors-anywhere.herokuapp.com/'
+
+// @ts-ignore
+window.braveStorybookUnpadUrl = async function UnpadUrl(paddedUrl: string, mimeType = 'image/jpg'): Promise<string> {
+  const response = await fetch(proxyUrl + paddedUrl)
+  const blob = await response.blob();
+  // @ts-ignore (Blob.arrayBuffer does exist)
+  const buffer = await blob.arrayBuffer()
+  const dataUrl = await getUnpaddedAsDataUrl(buffer, mimeType)
+  return dataUrl
+}
+
 
 export default function Provider ({ story }: any) {
   return (
@@ -45,13 +64,15 @@ storiesOf('New Tab/Containers', module)
   .addDecorator(story => <Provider story={story()} />)
   .add('Default', () => {
     const doNothing = (value: boolean) => value
-    const newTabData = getNewTabData(store.getState().newTabData)
-    const gridSitesData = getGridSitesData(store.getState().gridSitesData)
+    const state = store.getState()
+    const newTabData = getNewTabData(state.newTabData)
+    const gridSitesData = getGridSitesData(state.gridSitesData)
     return (
       <NewTabPage
         newTabData={newTabData}
+        todayData={todayState}
         gridSitesData={gridSitesData}
-        actions={Object.assign({}, newTabActions, gridSitesActions, rewardsActions, binanceActions, geminiActions, bitcoinDotComActions, cryptoDotComActions)}
+        actions={Object.assign({}, newTabActions, gridSitesActions, rewardsActions, binanceActions, geminiActions, bitcoinDotComActions, cryptoDotComActions, todayActions)}
         saveShowBackgroundImage={doNothing}
         saveShowStats={doNothing}
         saveShowRewards={doNothing}
