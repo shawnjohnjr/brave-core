@@ -22,4 +22,9 @@ std::string GetChannelName() {
 #endif  // !OFFICIAL_BUILD
 }
 
+bool IsDeveloperChannel() {
+  std::string channel = GetChannelName();
+  return channel.compare("developer") == 0;
+}
+
 }  // namespace brave
